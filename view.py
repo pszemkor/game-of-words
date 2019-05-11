@@ -1,4 +1,4 @@
 class GameView:
-    def notify(self):
+    def notify(self, event):
         pass
 
