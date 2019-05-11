@@ -1,3 +1,6 @@
+import pygame
+
+
 class EventMenager:
     def __init__(self):
         from weakref import WeakKeyDictionary
@@ -33,16 +36,25 @@ class QuitEvent(Event):
 
 
 class CPUSpinnerController:
-    def __init__(self):
+    def __init__(self, event_manager):
         self.going = True
+        self.event_manager = event_manager
+        self.event_manager.register(self)
 
     def run(self):
-        pass
+        clock = pygame.time.Clock()
+        elapsed = 0
+        while self.going:
+            clock.tick(100)
+            event = TickEvent()
+            self.event_manager.post(event)
+            elapsed += 1
 
-    def notify(self):
-        pass
+    def notify(self, event):
+        if isinstance(event, QuitEvent):
+            self.going = False
 
 
 class MouseController:
-    def notify(self):
+    def notify(self, event):
         pass
