@@ -42,7 +42,7 @@ class Dictionary:
     def __init__(self):
         self.possible_words = set()
         for c in string.ascii_uppercase:
-            file = c + "word.csv"
+            file ="words/"+ c + "word.csv"
             with open(file, 'r', encoding='ISO-8859-1', newline='') as csvFile:
                 reader = csv.reader(csvFile)
                 for row in reader:
