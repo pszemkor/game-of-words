@@ -12,6 +12,37 @@ class EventMenager:
 
     def post(self, event):
         for listener in self.listeners.keys():
-            listener.notify()
+            listener.notify(event)
 
 
+class Event:
+    def __init__(self):
+        self.name = "Generic event"
+
+
+class TickEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "CPU Tick Event"
+
+
+class QuitEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "Quit Event"
+
+
+class CPUSpinnerController:
+    def __init__(self):
+        self.going = True
+
+    def run(self):
+        pass
+
+    def notify(self):
+        pass
+
+
+class MouseController:
+    def notify(self):
+        pass
