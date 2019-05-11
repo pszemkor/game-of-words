@@ -41,6 +41,31 @@ class MouseEvent(Event):
         self.name = "Mouse Event"
 
 
+class TileBoxEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "Tile Box Event"
+
+
+class EmptyFieldEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "Empty Field Event"
+
+
+# superior event for buttons
+class ButtonEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "Button Event"
+
+
+class ConfirmButtonEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "ConfirmButtonEvent"
+
+
 class CPUSpinnerController:
     def __init__(self, event_manager):
         self.going = True
