@@ -4,6 +4,11 @@ import io
 import shutil
 from enum import Enum
 
+#todo -> napisac validator
+#todo -> ogarnac tileboxy
+#todo -> algo do "AI"
+#todo -> poprawić dostępne litery na angielski
+#todo -> ogarnąć eventy
 
 class Validator:
 
@@ -52,22 +57,30 @@ class Dictionary:
         print(len(self.possible_words))
 
 
-# game has 2 players, board, possible_words  and validator
-class Game:
+class BagOfLetters:
     def __init__(self):
-        self.board = Board()
-        self.human_player = Player()
-        self.cpu_player = Player()
-        self.dictionary = Dictionary()
         # '?' is blank tile
+        # count of letters that are still in game
         self.available_letters = {'a': 9, "e": 7, "i": 8, "n": 5, "o": 6, "r": 4, "s": 4, "w": 4, "z": 5, "c": 3,
                                   "d": 3, "k": 3, "l": 3, "m": 3, "p": 3, "t": 3, "y": 4, "b": 3, "g": 2, "h": 2,
                                   "j": 2, "u": 2, "ł": 2, "ą": 5, "ę": 1, "f": 1, "ó": 1, "ś": 1, "ż": 1, "ć": 1,
                                   "ń": 1, "ź": 1, "?": 2}
 
+
+# game has 2 players, board, possible_words  and validator
+class Game:
+    def __init__(self):
+        self.board = Board()
+        self.players = []
+        self.dictionary = Dictionary()
+        self.bags_of_letters = BagOfLetters()
+        self.turn = None
+
     def __str__(self):
         return self.board.__str__()
 
+    def init_player_boxes(self):
+        pass
 
 class FieldState(Enum):
     EMPTY = 0
@@ -106,7 +119,7 @@ class Tile:
             return 3
         elif self.character in "ąęfóśż":
             return 5
-        elif self in "ć":
+        elif self.character in "ć":
             return 6
         elif self.character in "ń":
             return 7
@@ -116,10 +129,21 @@ class Tile:
             return -1
 
 
+class TileBox:
+    def __init__(self):
+        pass
+
 class Player:
     def __init__(self):
         self.score = 0
-        self.owned_tile = []
+        self.owned_tilebox = TileBox()
+
+class AIPlayer(Player):
+    def __init__(self):
+        super().__init__()
+
+    def make_move(self):
+        pass
 
 
 if __name__ == "__main__":
