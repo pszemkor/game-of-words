@@ -4,11 +4,12 @@ import io
 import shutil
 from enum import Enum
 
-#todo -> napisac validator
-#todo -> ogarnac tileboxy
-#todo -> algo do "AI"
-#todo -> poprawić dostępne litery na angielski
-#todo -> ogarnąć eventy
+
+# todo -> napisac validator
+# todo -> ogarnac tileboxy
+# todo -> algo do "AI"
+# todo -> poprawić dostępne litery na angielski
+# todo -> ogarnąć eventy
 
 class Validator:
 
@@ -82,6 +83,7 @@ class Game:
     def init_player_boxes(self):
         pass
 
+
 class FieldState(Enum):
     EMPTY = 0
     TEMPORARY = 1
@@ -91,7 +93,8 @@ class FieldState(Enum):
 # board consists of Fields, and every field can have some tile or just be empty
 class Field:
     def __init__(self, bonus):
-        self.tile = FieldState.EMPTY
+        self.tile = None
+        self.state = FieldState.EMPTY
         self.bonus = bonus
 
     def __str__(self):
@@ -100,6 +103,12 @@ class Field:
             return "$"
         else:
             return self.tile.__str__()
+
+    def place_tile(self, tile):
+        pass
+
+    def confirm_tile(self):
+        self.state = FieldState.FIXED
 
 
 class Tile:
@@ -133,16 +142,18 @@ class TileBox:
     def __init__(self):
         pass
 
+
 class Player:
     def __init__(self):
         self.score = 0
         self.owned_tilebox = TileBox()
 
+
 class AIPlayer(Player):
     def __init__(self):
         super().__init__()
 
-    def make_move(self):
+    def make_turn(self):
         pass
 
 
