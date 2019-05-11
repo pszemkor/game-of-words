@@ -1,7 +1,7 @@
 import pygame
 
 
-class EventMenager:
+class EventManager:
     def __init__(self):
         from weakref import WeakKeyDictionary
         self.listeners = WeakKeyDictionary()
@@ -33,6 +33,12 @@ class QuitEvent(Event):
     def __init__(self):
         super().__init__()
         self.name = "Quit Event"
+
+
+class MouseEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "Mouse Event"
 
 
 class CPUSpinnerController:

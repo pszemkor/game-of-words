@@ -2,6 +2,7 @@ import csv
 import string
 import io
 import shutil
+from enum import Enum
 
 
 class Validator:
@@ -42,7 +43,7 @@ class Dictionary:
     def __init__(self):
         self.possible_words = set()
         for c in string.ascii_uppercase:
-            file ="words/"+ c + "word.csv"
+            file = "words/" + c + "word.csv"
             with open(file, 'r', encoding='ISO-8859-1', newline='') as csvFile:
                 reader = csv.reader(csvFile)
                 for row in reader:
@@ -68,15 +69,21 @@ class Game:
         return self.board.__str__()
 
 
+class FieldState(Enum):
+    EMPTY = 0
+    TEMPORARY = 1
+    FIXED = 2
+
+
 # board consists of Fields, and every field can have some tile or just be empty
 class Field:
     def __init__(self, bonus):
-        self.tile = None
+        self.tile = FieldState.EMPTY
         self.bonus = bonus
 
     def __str__(self):
         # if there is no tile on a field:
-        if self.tile is None:
+        if self.tile is FieldState.EMPTY:
             return "$"
         else:
             return self.tile.__str__()
