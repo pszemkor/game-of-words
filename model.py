@@ -4,6 +4,7 @@ import io
 import shutil
 from enum import Enum
 
+BOARD_SIZE = 15
 
 # todo -> napisac validator
 # todo -> ogarnac tileboxy
@@ -23,11 +24,11 @@ class Validator:
 class Board:
     def __init__(self):
         # board with zeros
-        self.board = [[Field(0) for i in range(15)] for j in range(15)]
+        self.fields = [[Field(0) for i in range(BOARD_SIZE)] for j in range(BOARD_SIZE)]
 
     def __str__(self):
         string = ""
-        for row in self.board:
+        for row in self.fields:
             for el in row:
                 if el.tile is not None:
                     if el is row[0]:
@@ -157,6 +158,4 @@ class AIPlayer(Player):
         pass
 
 
-if __name__ == "__main__":
-    game = Game()
-    print(game.__str__())
+
