@@ -121,3 +121,4 @@ class GameView:
             self.show_board(event.board)
         elif isinstance(event, controller.TileBoxBuildEvent):
             self.show_tilebox(event.tilebox)
+

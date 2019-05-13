@@ -59,13 +59,20 @@ class Board:
         pass
 
     def set_active_field(self, field):
+        print(field)
         if field is None:
             if self.active_field is not None:
-                self.active_field.set_is_active = False
+                self.active_field.is_active = False
         else:
-            self.active_field.set_is_active = False
-            field.set_is_active(True)
+            if self.active_field is not None:
+                self.active_field.is_active = False
+            field.is_active = True
             self.active_field = field
+            print('Field was set to active', field)
+
+    def get_field_from_coords(self, coords):
+        print('sent to getter', coords[0])
+        return self.fields[coords[0]][coords[1]]
 
 
 # TO DO -> CHECK WHETHER EVERYTHING IS IN PROGRAM MEMORY EVERY TIME (101 358 words is probably enough to play XD)
@@ -111,7 +118,10 @@ class Game:
         pass
 
     def notify(self, event):
-        pass
+        if isinstance(event, controller.SelectBoardFieldEvent):
+            print(event.coords)
+            self.board.set_active_field(self.board.get_field_from_coords(event.coords))
+
 
 class FieldState(Enum):
     EMPTY = 0
