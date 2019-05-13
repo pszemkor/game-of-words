@@ -14,6 +14,7 @@ class EventManager:
     def __init__(self):
         from weakref import WeakKeyDictionary
         self.listeners = WeakKeyDictionary()
+        self.screen_state = ScreenState.GAME
 
     def register(self, listener):
         self.listeners[listener] = 1
@@ -98,11 +99,25 @@ class ConfirmButtonEvent(Event):
         self.name = "ConfirmButtonEvent"
 
 
+class SelectBoardFieldEvent(Event):
+    def __init__(self, coords):
+        super().__init__()
+        self.name = "SelectBoardFieldEvent"
+        self.coords = coords
+
+
+class SelectTileBoxFieldEvent(Event):
+    def __init__(self, coords):
+        super().__init__()
+        self.name = "SelectTileBoxFieldEvent"
+        self.coords = coords
+
+
 # #################################################################
 
 class ScreenState(Enum):
     MENU = 0
-    ROUND = 1
+    GAME = 1
     END_SCORE = 2
     ABOUT = 3
     BAG_OF_LETTERS = 4
@@ -133,19 +148,29 @@ class CPUSpinnerController:
 
 # todo -> check coordinates and set event_to_sent (it depends on coordinates)
 class MouseEventHandler:
-    @staticmethod
-    def get_event_from_coordinates(coords):
-        print(coords)
-        if coords[0] in range(config.LEFT_EDGE_BOARD_OFFSET, config.LEFT_EDGE_BOARD_OFFSET + config.BOARD_WIDTH) \
-                and coords[1] in range(config.TOP_EDGE_BOARD_OFFSET, config.TOP_EDGE_BOARD_OFFSET + config.BOARD_WIDTH):
-            print('Plansza!!')
-        pass
+    def __init__(self, event_manager):
+        self.event_manager = event_manager
+
+    def get_event_from_coordinates(self, coords):
+        if self.event_manager.screen_state == ScreenState.GAME:
+            print(coords)
+            if coords[0] in range(config.LEFT_EDGE_BOARD_OFFSET, config.LEFT_EDGE_BOARD_OFFSET + config.BOARD_WIDTH) \
+                    and coords[1] in range(config.TOP_EDGE_BOARD_OFFSET,
+                                           config.TOP_EDGE_BOARD_OFFSET + config.BOARD_WIDTH):
+                field_coords = [0, 0]
+                field_coords[0] = (coords[0] - config.LEFT_EDGE_BOARD_OFFSET) // config.FIELD_RECTANGLE_WIDTH
+                field_coords[1] = (coords[1] - config.TOP_EDGE_BOARD_OFFSET) // config.FIELD_RECTANGLE_WIDTH
+                ev_to_send = SelectBoardFieldEvent(field_coords)
+                print('Plansza!!', field_coords[0], field_coords[1])
+                return ev_to_send
+            pass
 
 
 class MouseController:
     def __init__(self, event_manager):
         self.event_manager = event_manager
         self.event_manager.register(self)
+        self.mouse_event_handler = MouseEventHandler(self.event_manager)
 
     def notify(self, event):
         if isinstance(event, TickEvent):
@@ -157,7 +182,7 @@ class MouseController:
                 # left mouse button
                 elif ev.type == pygame.MOUSEBUTTONDOWN:
                     if ev.button == 1:
-                        event_to_send = MouseEventHandler.get_event_from_coordinates(ev.pos)
+                        event_to_send = self.mouse_event_handler.get_event_from_coordinates(ev.pos)
                         pass
 
                 if event_to_send:

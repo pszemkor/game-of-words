@@ -32,6 +32,7 @@ class Board:
         self.fields = [[Field(0) for i in range(config.BOARD_SIZE)] for j in range(config.BOARD_SIZE)]
         self.ev_manager = ev_manager
         self.ev_manager.register(self)
+        self.active_field = None
 
         event_to_send = controller.BoardBuildEvent(self)
         self.ev_manager.post(event_to_send)
@@ -56,6 +57,15 @@ class Board:
 
     def notify(self, event):
         pass
+
+    def set_active_field(self, field):
+        if field is None:
+            if self.active_field is not None:
+                self.active_field.set_is_active = False
+        else:
+            self.active_field.set_is_active = False
+            field.set_is_active(True)
+            self.active_field = field
 
 
 # TO DO -> CHECK WHETHER EVERYTHING IS IN PROGRAM MEMORY EVERY TIME (101 358 words is probably enough to play XD)
@@ -115,6 +125,7 @@ class Field:
         self.tile = None
         self.state = FieldState.EMPTY
         self.bonus = bonus
+        self.is_active = False
 
     def __str__(self):
         # if there is no tile on a field:
@@ -130,6 +141,9 @@ class Field:
 
     def confirm_tile(self):
         self.state = FieldState.FIXED
+
+    def set_is_active(self, is_active):
+        self.is_active = is_active
 
 
 class Tile:
@@ -162,7 +176,16 @@ class Tile:
 class TileBox:
     def __init__(self):
         self.fields = [Field(0) for i in range(config.TILEBOX_SIZE)]
-        pass
+        self.active_field = None
+
+    def set_active_field(self, field):
+        if field is None:
+            if self.active_field is not None:
+                self.active_field.set_is_active = False
+        else:
+            self.active_field.set_is_active = False
+            field.set_is_active(True)
+            self.active_field = field
 
 
 class Player:
