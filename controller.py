@@ -113,6 +113,12 @@ class SelectTileBoxFieldEvent(Event):
         self.coords = coords
 
 
+class ConfirmButtonPressedEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "ConfirmButtonPressedEvent"
+
+
 # #################################################################
 
 class ScreenState(Enum):
@@ -131,8 +137,6 @@ class VerifyBoardEvent(Event):
         super().__init__()
         self.name = "VerifyBoardEvent"
         self.board = board
-
-
 
 
 class CPUSpinnerController:

@@ -8,12 +8,9 @@ import config
 import controller
 
 
-# todo -> ogarnac tileboxy
 # todo -> algo do "AI"
-# todo -> poprawić dostępne litery na angielski
-# todo -> ogarnąć eventy
-# todo -> dodać rundy - w każdej rundzie wywoływane jest wyświetlenie ustawień (punktacja, tilebox)
-# todo    dla każdego z graczy, na razie nie ma rund
+# todo ->
+
 
 
 class Validator:
@@ -284,6 +281,7 @@ class Player:
     def __init__(self):
         self.score = 0
         self.tilebox = TileBox()
+        self.pass_strike = 0
 
 
 class AIPlayer(Player):
