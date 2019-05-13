@@ -11,7 +11,7 @@ def main():
     game_view = view.GameView(ev_manager)
     game = model.Game(ev_manager)
 
-    mouse_controller = controller.MouseController(ev_manager)
+    mouse_controller = controller.MouseController(ev_manager, game_view, game)
     cpu_spinner = controller.CPUSpinnerController(ev_manager)
 
     ##### DEBUG

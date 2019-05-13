@@ -208,28 +208,32 @@ class Game:
     def notify(self, event):
         # handle board active field selection
         if isinstance(event, controller.SelectFieldEvent) and event.field_group == FieldGroup.BOARD:
-            field = self.board.get_field_from_coords(event.coords)
+            field = event.field
             if field.is_active:
                 self.board.set_active_field(None)
+                # tilebox has active field -> will swap tiles
                 if self.active_player.tilebox.active_field is not None:
                     self.active_player.tilebox.active_field.tile, field.tile = field.tile, self.active_player.tilebox.active_field.tile
                     self.active_player.tilebox.active_field.state, field.state = field.state, self.active_player.tilebox.active_field.state
                     self.active_player.tilebox.set_active_field(None)
                     self.board.set_active_field(None)
+                # todo VALIDATION - tiles have just been swapped!!
             else:
                 self.board.set_active_field(field)
             ev = controller.UpdateFieldEvent(field)
             self.ev_manager.post(ev)
+        # handle tilebox active field selection
         elif isinstance(event, controller.SelectFieldEvent) and event.field_group == FieldGroup.TILEBOX:
-            field = self.active_player.tilebox.get_field_from_coords(event.coords)
+            field = event.field
             if field.is_active:
                 self.active_player.tilebox.set_active_field(None)
+                # tilebox has active field -> will swap tiles
                 if self.board.active_field is not None:
                     self.board.active_field.tile, field.tile = field.tile, self.board.active_field.tile
                     self.board.active_field.state, field.state = field.state, self.board.active_field.state
                     self.active_player.tilebox.set_active_field(None)
                     self.board.set_active_field(None)
-                # VALIDATION!!
+                # todo VALIDATION - tiles have just been swapped!!
             else:
                 self.active_player.tilebox.set_active_field(field)
             ev = controller.UpdateFieldEvent(field)
@@ -309,15 +313,6 @@ class TileBox(FieldsContainer):
         super().__init__()
         self.fields = [Field(0) for i in range(config.TILEBOX_SIZE)]
         self.active_field = None
-
-    # def set_active_field(self, field):
-    #     if field is None:
-    #         if self.active_field is not None:
-    #             self.active_field.is_active = False
-    #     else:
-    #         self.active_field.is_active = False
-    #         field.is_active = True
-    #         self.active_field = field
 
     def get_field_from_coords(self, coords):
         return self.fields[coords[0]]
