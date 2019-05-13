@@ -12,7 +12,6 @@ import controller
 # todo ->
 
 
-
 class Validator:
 
     def __init__(self, ev_manager, dictionary):
@@ -110,9 +109,26 @@ class Validator:
         return self.verify_board(board)
 
 
-class Board:
+# introduced because Board and Tilebox share some methods
+class FieldsContainer:
+    def __init__(self):
+        self.active_field = None
+
+    def set_active_field(self, field):
+        if field is None:
+            if self.active_field is not None:
+                self.active_field.is_active = False
+        else:
+            if self.active_field is not None:
+                self.active_field.is_active = False
+            field.is_active = True
+            self.active_field = field
+
+
+class Board(FieldsContainer):
     def __init__(self, ev_manager):
         # board with zeros
+        super().__init__()
         self.fields = [[Field(0) for i in range(config.BOARD_SIZE)] for j in range(config.BOARD_SIZE)]
         self.ev_manager = ev_manager
         self.ev_manager.register(self)
@@ -141,16 +157,6 @@ class Board:
 
     def notify(self, event):
         pass
-
-    def set_active_field(self, field):
-        if field is None:
-            if self.active_field is not None:
-                self.active_field.is_active = False
-        else:
-            if self.active_field is not None:
-                self.active_field.is_active = False
-            field.is_active = True
-            self.active_field = field
 
     def get_field_from_coords(self, coords):
         return self.fields[coords[1]][coords[0]]
@@ -188,6 +194,7 @@ class Game:
 
         self.board = Board(self.ev_manager)
         self.players = []
+        self.active_player = None
         self.dictionary = Dictionary()
         self.bags_of_letters = BagOfLetters()
         self.turn = None
@@ -199,10 +206,45 @@ class Game:
         pass
 
     def notify(self, event):
-        if isinstance(event, controller.SelectBoardFieldEvent):
-            self.board.set_active_field(self.board.get_field_from_coords(event.coords))
-            ev = controller.BoardBuildEvent(self.board)
+        # handle board active field selection
+        if isinstance(event, controller.SelectFieldEvent) and event.field_group == FieldGroup.BOARD:
+            field = self.board.get_field_from_coords(event.coords)
+            if field.is_active:
+                self.board.set_active_field(None)
+                if self.active_player.tilebox.active_field is not None:
+                    self.active_player.tilebox.active_field.tile, field.tile = field.tile, self.active_player.tilebox.active_field.tile
+                    self.active_player.tilebox.active_field.state, field.state = field.state, self.active_player.tilebox.active_field.state
+                    self.active_player.tilebox.set_active_field(None)
+                    self.board.set_active_field(None)
+            else:
+                self.board.set_active_field(field)
+            ev = controller.UpdateFieldEvent(field)
             self.ev_manager.post(ev)
+        elif isinstance(event, controller.SelectFieldEvent) and event.field_group == FieldGroup.TILEBOX:
+            field = self.active_player.tilebox.get_field_from_coords(event.coords)
+            if field.is_active:
+                self.active_player.tilebox.set_active_field(None)
+                if self.board.active_field is not None:
+                    self.board.active_field.tile, field.tile = field.tile, self.board.active_field.tile
+                    self.board.active_field.state, field.state = field.state, self.board.active_field.state
+                    self.active_player.tilebox.set_active_field(None)
+                    self.board.set_active_field(None)
+                # VALIDATION!!
+            else:
+                self.active_player.tilebox.set_active_field(field)
+            ev = controller.UpdateFieldEvent(field)
+            self.ev_manager.post(ev)
+
+    def set_active_player(self, player):
+        if player in self.players:
+            self.active_player = player
+    # todo -> add exception - player passed to become active is not in the list of players
+
+
+class FieldGroup(Enum):
+    BOARD = 0
+    TILEBOX = 1
+
 
 class FieldState(Enum):
     EMPTY = 0
@@ -262,19 +304,23 @@ class Tile:
             return -1
 
 
-class TileBox:
+class TileBox(FieldsContainer):
     def __init__(self):
+        super().__init__()
         self.fields = [Field(0) for i in range(config.TILEBOX_SIZE)]
         self.active_field = None
 
-    def set_active_field(self, field):
-        if field is None:
-            if self.active_field is not None:
-                self.active_field.is_active = False
-        else:
-            self.active_field.is_active = False
-            field.is_active = True
-            self.active_field = field
+    # def set_active_field(self, field):
+    #     if field is None:
+    #         if self.active_field is not None:
+    #             self.active_field.is_active = False
+    #     else:
+    #         self.active_field.is_active = False
+    #         field.is_active = True
+    #         self.active_field = field
+
+    def get_field_from_coords(self, coords):
+        return self.fields[coords[0]]
 
 
 class Player:

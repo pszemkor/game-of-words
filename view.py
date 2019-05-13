@@ -13,22 +13,24 @@ class FieldSprite(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, group)
         self.field = field
         self.image = pygame.Surface(config.FIELD_RECTANGLE)
-        print(field.is_active)
-        if field.is_active:
+        self.update()
+
+    def update(self):
+        if self.field.is_active:
             self.image.fill((255, 255, 0))
         else:
             self.image.fill((0, 255, 255))
 
-        if field.state is model.FieldState.FIXED:
+        if self.field.state is model.FieldState.FIXED:
             self.image.fill((200, 50, 0))
             font = pygame.font.Font(None, config.FIELD_RECTANGLE[0])
-            text = field.tile.__str__()
+            text = self.field.tile.__str__()
             text_img = font.render(text, 1, (255, 255, 255))
             text_rec = text_img.get_rect(center=(config.FIELD_RECTANGLE[0] // 2, config.FIELD_RECTANGLE[0] // 2))
             self.image.blit(text_img, text_rec)
-        elif field.state is model.FieldState.TEMPORARY:
+        elif self.field.state is model.FieldState.TEMPORARY:
             font = pygame.font.Font(None, config.FIELD_RECTANGLE[0])
-            text = field.tile.__str__()
+            text = self.field.tile.__str__()
             text_img = font.render(text, 1, (255, 255, 255))
             text_rec = text_img.get_rect(center=(config.FIELD_RECTANGLE[0] // 2, config.FIELD_RECTANGLE[0] // 2))
             self.image.blit(text_img, text_rec)
@@ -111,6 +113,11 @@ class GameView:
         dirty_rects = dirty_rects1 + dirty_rects2
         pygame.display.update(dirty_rects)
 
+    def get_field_sprite(self, field):
+        for sprite in self.back_sprites:
+            if hasattr(sprite, "field") and sprite.field == field:
+                return sprite
+
     def notify(self, event):
         if isinstance(event, controller.TickEvent):
             self.draw_everything()
@@ -118,6 +125,5 @@ class GameView:
             self.show_board(event.board)
         elif isinstance(event, controller.TileBoxBuildEvent):
             self.show_tilebox(event.tilebox)
-
-
-
+        elif isinstance(event, controller.UpdateFieldEvent):
+            self.get_field_sprite(event.field)

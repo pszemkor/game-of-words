@@ -4,6 +4,7 @@ from enum import Enum
 
 import config
 import view
+import model
 
 
 def Debug(msg):
@@ -99,24 +100,25 @@ class ConfirmButtonEvent(Event):
         self.name = "ConfirmButtonEvent"
 
 
-class SelectBoardFieldEvent(Event):
-    def __init__(self, coords):
+class SelectFieldEvent(Event):
+    def __init__(self, coords, field_group):
         super().__init__()
-        self.name = "SelectBoardFieldEvent"
+        self.name = "SelectFieldEvent"
         self.coords = coords
-
-
-class SelectTileBoxFieldEvent(Event):
-    def __init__(self, coords):
-        super().__init__()
-        self.name = "SelectTileBoxFieldEvent"
-        self.coords = coords
+        self.field_group = field_group
 
 
 class ConfirmButtonPressedEvent(Event):
     def __init__(self):
         super().__init__()
         self.name = "ConfirmButtonPressedEvent"
+
+
+class UpdateFieldEvent(Event):
+    def __init__(self, field):
+        super().__init__()
+        self.name = "UpdateFieldEvent"
+        self.field = field
 
 
 # #################################################################
@@ -127,7 +129,8 @@ class ScreenState(Enum):
     END_SCORE = 2
     ABOUT = 3
     BAG_OF_LETTERS = 4
-    BOARD_EDITOR = 5
+    SETTINGS_MENU = 5
+    BOARD_EDITOR = 6
 
 
 # #################################################################
@@ -167,16 +170,26 @@ class MouseEventHandler:
     def get_event_from_coordinates(self, coords):
         if self.event_manager.screen_state == ScreenState.GAME:
             print(coords)
+            # board area
             if coords[0] in range(config.LEFT_EDGE_BOARD_OFFSET, config.LEFT_EDGE_BOARD_OFFSET + config.BOARD_WIDTH) \
                     and coords[1] in range(config.TOP_EDGE_BOARD_OFFSET,
                                            config.TOP_EDGE_BOARD_OFFSET + config.BOARD_WIDTH):
                 field_coords = [0, 0]
                 field_coords[0] = (coords[0] - config.LEFT_EDGE_BOARD_OFFSET) // config.FIELD_RECTANGLE_WIDTH
                 field_coords[1] = (coords[1] - config.TOP_EDGE_BOARD_OFFSET) // config.FIELD_RECTANGLE_WIDTH
-                ev_to_send = SelectBoardFieldEvent(field_coords)
+                ev_to_send = SelectFieldEvent(field_coords, model.FieldGroup.BOARD)
                 print('Plansza!!', field_coords[0], field_coords[1])
                 return ev_to_send
-            pass
+            # tilebox area
+            elif coords[0] in range(config.LEFT_EDGE_TILEBOX_OFFSET,
+                                    config.LEFT_EDGE_TILEBOX_OFFSET + config.TILEBOX_WIDTH) \
+                    and coords[1] in range(config.TOP_EDGE_TILEBOX_OFFSET,
+                                           config.TOP_EDGE_TILEBOX_OFFSET + config.TILEBOX_WIDTH):
+                print('Tile box!')
+                field_coords = [0]
+                field_coords[0] = (coords[0] - config.LEFT_EDGE_TILEBOX_OFFSET) // config.FIELD_RECTANGLE_WIDTH
+                ev_to_send = SelectFieldEvent(field_coords, model.FieldGroup.TILEBOX)
+                return ev_to_send
 
 
 class MouseController:
