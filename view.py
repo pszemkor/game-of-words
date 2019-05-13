@@ -13,6 +13,7 @@ class FieldSprite(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, group)
         self.field = field
         self.image = pygame.Surface(config.FIELD_RECTANGLE)
+        print(field.is_active)
         if field.is_active:
             self.image.fill((255, 255, 0))
         else:
@@ -116,6 +117,7 @@ class GameView:
 
     def notify(self, event):
         if isinstance(event, controller.TickEvent):
+            self.draw_everything()
             self.draw_everything()
         elif isinstance(event, controller.BoardBuildEvent):
             self.show_board(event.board)

@@ -59,7 +59,6 @@ class Board:
         pass
 
     def set_active_field(self, field):
-        print(field)
         if field is None:
             if self.active_field is not None:
                 self.active_field.is_active = False
@@ -68,10 +67,8 @@ class Board:
                 self.active_field.is_active = False
             field.is_active = True
             self.active_field = field
-            print('Field was set to active', field)
 
     def get_field_from_coords(self, coords):
-        print('sent to getter', coords[0])
         return self.fields[coords[0]][coords[1]]
 
 
@@ -119,7 +116,6 @@ class Game:
 
     def notify(self, event):
         if isinstance(event, controller.SelectBoardFieldEvent):
-            print(event.coords)
             self.board.set_active_field(self.board.get_field_from_coords(event.coords))
 
 
@@ -151,9 +147,6 @@ class Field:
 
     def confirm_tile(self):
         self.state = FieldState.FIXED
-
-    def set_is_active(self, is_active):
-        self.is_active = is_active
 
 
 class Tile:
@@ -191,10 +184,10 @@ class TileBox:
     def set_active_field(self, field):
         if field is None:
             if self.active_field is not None:
-                self.active_field.set_is_active = False
+                self.active_field.is_active = False
         else:
-            self.active_field.set_is_active = False
-            field.set_is_active(True)
+            self.active_field.is_active = False
+            field.is_active = True
             self.active_field = field
 
 
