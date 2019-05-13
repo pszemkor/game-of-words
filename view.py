@@ -89,11 +89,7 @@ class GameView:
 
         column = 0
         for field in tilebox.fields:
-            # if column < TILEBOX_SIZE:
-            # else:
-            #     column = 0
-            #     field_rect = field_rect.move(-(TILEBOX_SIZE - 1) * FIELD_RECTANGLE_WIDTH, FIELD_RECTANGLE_WIDTH)
-            # column += 1
+
             field_rect = field_rect.move(config.FIELD_RECTANGLE_WIDTH, 0)
             new_field_sprite = FieldSprite(field, self.back_sprites)
             new_field_sprite.rect = field_rect

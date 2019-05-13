@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+from enum import Enum
 
 import config
 import view
@@ -96,6 +97,19 @@ class ConfirmButtonEvent(Event):
         super().__init__()
         self.name = "ConfirmButtonEvent"
 
+
+# #################################################################
+
+class ScreenState(Enum):
+    MENU = 0
+    ROUND = 1
+    END_SCORE = 2
+    ABOUT = 3
+    BAG_OF_LETTERS = 4
+    BOARD_EDITOR = 5
+
+
+# #################################################################
 
 class CPUSpinnerController:
     def __init__(self, event_manager):
