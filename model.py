@@ -8,7 +8,6 @@ import config
 import controller
 
 
-# todo -> napisac validator
 # todo -> ogarnac tileboxy
 # todo -> algo do "AI"
 # todo -> poprawić dostępne litery na angielski
@@ -19,11 +18,99 @@ import controller
 
 class Validator:
 
-    def check_word(self, word, dictionary):
-        return True if word in dictionary else False
+    def __init__(self, ev_manager, dictionary):
+        self.event_manager = ev_manager
+        self.dictionary = dictionary
 
+    def check_word(self, word):
+        return True if word in self.dictionary else False
+
+    def check_if_one_line(self, board, first_coords, current_coords):
+        (x, y) = first_coords
+        (a, b) = current_coords
+        if x != a and y != b:
+            raise Exception("Tiles are not in one line!")
+
+    def get_behind_temp_horizontal(self, board, y):
+        letters_behind = ""
+        for i in range(y - 1, -1, -1):
+            if board.fields[i][y].state == FieldState.EMPTY:
+                return letters_behind
+            else:
+                letters_behind += board.fields[i][y].tile.character
+
+        return letters_behind[::-1]
+
+    def get_behind_temp_vertical(self, board, x):
+        letters_behind = ""
+        for i in range(x - 1, -1, -1):
+            if board.fields[x][i].state == FieldState.EMPTY:
+                return letters_behind
+            else:
+                letters_behind += board.fields[x][i].tile.character
+
+        return letters_behind[::-1]
+
+    def get_after_temp_horizontal(self, board, y):
+        letters_after = ""
+        for i in range(y, config.BOARD_SIZE, 1):
+            if board.fields[i][y].state == FieldState.EMPTY:
+                return letters_after
+            else:
+                letters_after += board.fields[i][y]
+        return letters_after
+
+    def get_after_temp_vertical(self, board, x):
+        letters_after = ""
+        for i in range(x, config.BOARD_SIZE, 1):
+            if board.fields[x][i].state == FieldState.EMPTY:
+                return letters_after
+            else:
+                letters_after += board.fields[x][i]
+        return letters_after
+
+    # method return length of new word (just for a while)
     def verify_board(self, board):
-        pass
+
+        first_temp = False
+        first_temp_coord = (-1, -1)
+        temps = []
+
+        # getting temporary tiles coordinates
+        for i in range(config.BOARD_SIZE):
+            for j in range(config.BOARD_SIZE):
+                if board.fields[i][j].state == FieldState.TEMPORARY:
+                    if first_temp:
+                        self.check_if_one_line(board, first_temp_coord, (i, j))
+                    temps.append((i, j))
+
+        horizontal_sorted = sorted(temps, key=lambda x: x[1])
+        vertical_sorted = None
+        if len(horizontal_sorted) > 1 and horizontal_sorted[0][1] == horizontal_sorted[1][1]:
+            vertical_sorted = sorted(temps, key=lambda x: x[0])
+
+        word_to_check = ""
+        if vertical_sorted is None:
+            x = horizontal_sorted[0][0]
+            word_to_check += self.get_behind_temp_horizontal(board, horizontal_sorted[0][1])
+            for y in range(horizontal_sorted[0][1], horizontal_sorted[len(horizontal_sorted) - 1][1]):
+                if board.fields[x][y].state == FieldState.EMPTY:
+                    raise Exception("Tiles not in one word")
+                word_to_check += board.fields[x][y].tile.character
+            word_to_check += self.get_after_temp_horizontal(board, horizontal_sorted[0][1])
+        else:
+            y = vertical_sorted[0][1]
+            word_to_check += self.get_behind_temp_vertical(board, vertical_sorted[0][0])
+            for x in range(vertical_sorted[0][0], vertical_sorted[len(vertical_sorted) - 1][0]):
+                if board.fields[x][y].state == FieldState.EMPTY:
+                    raise Exception("Tiles not in one word")
+                word_to_check += board.fields[x][y].tile.character
+            word_to_check += self.get_after_temp_vertical(board, vertical_sorted[0][0])
+        if self.check_word(word_to_check):
+            return len(word_to_check)
+
+    def notify(self, board):
+        return self.verify_board(board)
 
 
 class Board:
@@ -76,13 +163,13 @@ class BagOfLetters:
     def __init__(self):
         # '?' is blank tile
         # count of letters that are still in game
-        self.available_letters = {'a': 9, "e": 7, "i": 8, "n": 5, "o": 6, "r": 4, "s": 4, "w": 4, "z": 5, "c": 3,
-                                  "d": 3, "k": 3, "l": 3, "m": 3, "p": 3, "t": 3, "y": 4, "b": 3, "g": 2, "h": 2,
-                                  "j": 2, "u": 2, "ł": 2, "ą": 5, "ę": 1, "f": 1, "ó": 1, "ś": 1, "ż": 1, "ć": 1,
-                                  "ń": 1, "ź": 1, "?": 2}
+        self.available_letters = {'a': 9, "e": 12, "i": 8, "n": 6, "o": 8, "r": 6, "s": 4, "w": 2, "z": 1, "c": 2,
+                                  "d": 4, "k": 1, "l": 4, "m": 2, "p": 2, "t": 6, "y": 2, "b": 2, "g": 3, "h": 2,
+                                  "j": 1, "u": 4, "f": 2, "q": 1, "x": 1, "v": 2, "?": 2}
+
+    # game has 2 players, board, possible_words  and validator
 
 
-# game has 2 players, board, possible_words  and validator
 class Game:
     def __init__(self, ev_manager):
         self.ev_manager = ev_manager
@@ -103,13 +190,15 @@ class Game:
     def notify(self, event):
         pass
 
+
 class FieldState(Enum):
     EMPTY = 0
     TEMPORARY = 1
     FIXED = 2
 
+    # board consists of Fields, and every field can have some tile or just be empty
 
-# board consists of Fields, and every field can have some tile or just be empty
+
 class Field:
     def __init__(self, bonus):
         self.tile = None
@@ -141,20 +230,20 @@ class Tile:
 
     def get_value(self):
         # TO DO -> handle '?' tiles
-        if self.character in "aeinorswz":
+        if self.character in "eaionrtlsu":
             return 1
-        elif self.character in "cdklmpty":
+        elif self.character in "dg":
             return 2
-        elif self.character in "bghjłu":
+        elif self.character in "bcmp":
             return 3
-        elif self.character in "ąęfóśż":
+        elif self.character in "fhvwy":
+            return 4
+        elif self.character in "k":
             return 5
-        elif self.character in "ć":
-            return 6
-        elif self.character in "ń":
-            return 7
-        elif self.character in "ź":
-            return 9
+        elif self.character in "jx":
+            return 8
+        elif self.character in "qz":
+            return 10
         else:
             return -1
 
