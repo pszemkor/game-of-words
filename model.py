@@ -207,7 +207,7 @@ class Field:
 
     def __str__(self):
         # if there is no tile on a field:
-        if self.tile is FieldState.EMPTY:
+        if self.state is FieldState.EMPTY:
             return "$"
         else:
             return self.tile.__str__()
