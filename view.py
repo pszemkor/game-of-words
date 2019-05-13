@@ -27,8 +27,6 @@ class FieldSprite(pygame.sprite.Sprite):
             text_rec = text_img.get_rect(center=(config.FIELD_RECTANGLE[0] // 2, config.FIELD_RECTANGLE[0] // 2))
             self.image.blit(text_img, text_rec)
         elif field.state is model.FieldState.TEMPORARY:
-          
-
             font = pygame.font.Font(None, config.FIELD_RECTANGLE[0])
             text = field.tile.__str__()
             text_img = font.render(text, 1, (255, 255, 255))
@@ -68,7 +66,7 @@ class GameView:
         pygame.display.flip()
 
         field_rect = pygame.Rect(
-        (config.LEFT_EDGE_BOARD_OFFSET - config.FIELD_RECTANGLE_WIDTH, config.TOP_EDGE_BOARD_OFFSET, config.FIELD_RECTANGLE[0],
+        (config.LEFT_EDGE_BOARD_OFFSET - config.FIELD_RECTANGLE_WIDTH, config.TOP_EDGE_BOARD_OFFSET, config.FIELD_RECTANGLE[0], config.FIELD_RECTANGLE[0]))
 
 
         column = 0
@@ -116,9 +114,10 @@ class GameView:
     def notify(self, event):
         if isinstance(event, controller.TickEvent):
             self.draw_everything()
-            self.draw_everything()
         elif isinstance(event, controller.BoardBuildEvent):
             self.show_board(event.board)
         elif isinstance(event, controller.TileBoxBuildEvent):
             self.show_tilebox(event.tilebox)
+
+
 

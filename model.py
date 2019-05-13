@@ -156,7 +156,7 @@ class Board:
             self.active_field = field
 
     def get_field_from_coords(self, coords):
-        return self.fields[coords[0]][coords[1]]
+        return self.fields[coords[1]][coords[0]]
 
 
 # TO DO -> CHECK WHETHER EVERYTHING IS IN PROGRAM MEMORY EVERY TIME (101 358 words is probably enough to play XD)
@@ -204,8 +204,8 @@ class Game:
     def notify(self, event):
         if isinstance(event, controller.SelectBoardFieldEvent):
             self.board.set_active_field(self.board.get_field_from_coords(event.coords))
-
-
+            ev = controller.BoardBuildEvent(self.board)
+            self.ev_manager.post(ev)
 
 class FieldState(Enum):
     EMPTY = 0
