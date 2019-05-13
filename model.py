@@ -4,9 +4,8 @@ import io
 import shutil
 from enum import Enum
 
+import config
 import controller
-
-BOARD_SIZE = 15
 
 
 # todo -> napisac validator
@@ -14,6 +13,9 @@ BOARD_SIZE = 15
 # todo -> algo do "AI"
 # todo -> poprawić dostępne litery na angielski
 # todo -> ogarnąć eventy
+# todo -> dodać rundy - w każdej rundzie wywoływane jest wyświetlenie ustawień (punktacja, tilebox)
+# todo    dla każdego z graczy, na razie nie ma rund
+
 
 class Validator:
 
@@ -27,7 +29,7 @@ class Validator:
 class Board:
     def __init__(self, ev_manager):
         # board with zeros
-        self.fields = [[Field(0) for i in range(BOARD_SIZE)] for j in range(BOARD_SIZE)]
+        self.fields = [[Field(0) for i in range(config.BOARD_SIZE)] for j in range(config.BOARD_SIZE)]
         self.ev_manager = ev_manager
         self.ev_manager.register(self)
 
@@ -122,6 +124,8 @@ class Field:
             return self.tile.__str__()
 
     def place_tile(self, tile):
+        self.tile = tile
+        self.state = FieldState.TEMPORARY
         pass
 
     def confirm_tile(self):
@@ -129,8 +133,8 @@ class Field:
 
 
 class Tile:
-    def __init__(self):
-        self.character = '0'
+    def __init__(self, character):
+        self.character = character
 
     def __str__(self):
         return self.character
@@ -157,13 +161,14 @@ class Tile:
 
 class TileBox:
     def __init__(self):
+        self.fields = [Field(0) for i in range(config.TILEBOX_SIZE)]
         pass
 
 
 class Player:
     def __init__(self):
         self.score = 0
-        self.owned_tilebox = TileBox()
+        self.tilebox = TileBox()
 
 
 class AIPlayer(Player):
