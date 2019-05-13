@@ -27,10 +27,8 @@ class FieldSprite(pygame.sprite.Sprite):
             text_rec = text_img.get_rect(center=(config.FIELD_RECTANGLE[0] // 2, config.FIELD_RECTANGLE[0] // 2))
             self.image.blit(text_img, text_rec)
         elif field.state is model.FieldState.TEMPORARY:
-            if field.is_active:
-                self.image.fill((255, 255, 0))
-            else:
-                self.image.fill((55, 55, 0))
+          
+
             font = pygame.font.Font(None, config.FIELD_RECTANGLE[0])
             text = field.tile.__str__()
             text_img = font.render(text, 1, (255, 255, 255))
@@ -70,8 +68,8 @@ class GameView:
         pygame.display.flip()
 
         field_rect = pygame.Rect(
-            (config.LEFT_EDGE_BOARD_OFFSET - config.FIELD_RECTANGLE_WIDTH, config.TOP_EDGE_BOARD_OFFSET, config.FIELD_RECTANGLE[0],
-             config.FIELD_RECTANGLE[0]))
+        (config.LEFT_EDGE_BOARD_OFFSET - config.FIELD_RECTANGLE_WIDTH, config.TOP_EDGE_BOARD_OFFSET, config.FIELD_RECTANGLE[0],
+
 
         column = 0
 

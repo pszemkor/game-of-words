@@ -126,6 +126,15 @@ class ScreenState(Enum):
 
 # #################################################################
 
+class VerifyBoardEvent(Event):
+    def __init__(self, board):
+        super().__init__()
+        self.name = "VerifyBoardEvent"
+        self.board = board
+
+
+
+
 class CPUSpinnerController:
     def __init__(self, event_manager):
         self.going = True
