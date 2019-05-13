@@ -1,6 +1,10 @@
 import pygame
 from pygame.locals import *
 
+import config
+import view
+
+
 def Debug(msg):
     print(msg)
 
@@ -73,6 +77,13 @@ class BoardBuildEvent(Event):
         self.board = board
 
 
+class TileBoxBuildEvent(Event):
+    def __init__(self, tilebox):
+        super().__init__()
+        self.name = "Build TileBox Event"
+        self.tilebox = tilebox
+
+
 # superior event for buttons
 class ButtonEvent(Event):
     def __init__(self):
@@ -110,6 +121,10 @@ class CPUSpinnerController:
 class MouseEventHandler:
     @staticmethod
     def get_event_from_coordinates(coords):
+        print(coords)
+        if coords[0] in range(config.LEFT_EDGE_BOARD_OFFSET, config.LEFT_EDGE_BOARD_OFFSET + config.BOARD_WIDTH) \
+                and coords[1] in range(config.TOP_EDGE_BOARD_OFFSET, config.TOP_EDGE_BOARD_OFFSET + config.BOARD_WIDTH):
+            print('Plansza!!')
         pass
 
 
@@ -124,7 +139,7 @@ class MouseController:
                 event_to_send = None
 
                 if ev.type == pygame.QUIT:
-                        event_to_send = QuitEvent()
+                    event_to_send = QuitEvent()
                 # left mouse button
                 elif ev.type == pygame.MOUSEBUTTONDOWN:
                     if ev.button == 1:
@@ -133,4 +148,3 @@ class MouseController:
 
                 if event_to_send:
                     self.event_manager.post(event_to_send)
-
