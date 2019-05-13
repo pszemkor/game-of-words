@@ -4,6 +4,10 @@ import io
 import shutil
 from enum import Enum
 
+import controller
+
+BOARD_SIZE = 15
+
 
 # todo -> napisac validator
 # todo -> ogarnac tileboxy
@@ -21,13 +25,18 @@ class Validator:
 
 
 class Board:
-    def __init__(self):
+    def __init__(self, ev_manager):
         # board with zeros
-        self.board = [[Field(0) for i in range(15)] for j in range(15)]
+        self.fields = [[Field(0) for i in range(BOARD_SIZE)] for j in range(BOARD_SIZE)]
+        self.ev_manager = ev_manager
+        self.ev_manager.register(self)
+
+        event_to_send = controller.BoardBuildEvent(self)
+        self.ev_manager.post(event_to_send)
 
     def __str__(self):
         string = ""
-        for row in self.board:
+        for row in self.fields:
             for el in row:
                 if el.tile is not None:
                     if el is row[0]:
@@ -42,6 +51,9 @@ class Board:
 
             string += '\n'
         return string
+
+    def notify(self, event):
+        pass
 
 
 # TO DO -> CHECK WHETHER EVERYTHING IS IN PROGRAM MEMORY EVERY TIME (101 358 words is probably enough to play XD)
@@ -70,8 +82,11 @@ class BagOfLetters:
 
 # game has 2 players, board, possible_words  and validator
 class Game:
-    def __init__(self):
-        self.board = Board()
+    def __init__(self, ev_manager):
+        self.ev_manager = ev_manager
+        self.ev_manager.register(self)
+
+        self.board = Board(self.ev_manager)
         self.players = []
         self.dictionary = Dictionary()
         self.bags_of_letters = BagOfLetters()
@@ -83,6 +98,8 @@ class Game:
     def init_player_boxes(self):
         pass
 
+    def notify(self, event):
+        pass
 
 class FieldState(Enum):
     EMPTY = 0
@@ -155,8 +172,3 @@ class AIPlayer(Player):
 
     def make_turn(self):
         pass
-
-
-if __name__ == "__main__":
-    game = Game()
-    print(game.__str__())

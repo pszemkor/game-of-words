@@ -1,4 +1,8 @@
 import pygame
+from pygame.locals import *
+
+def Debug(msg):
+    print(msg)
 
 
 class EventManager:
@@ -14,6 +18,8 @@ class EventManager:
             del self.listeners[listener]
 
     def post(self, event):
+        if not isinstance(event, TickEvent):
+            Debug("     Message: " + event.name)
         for listener in self.listeners.keys():
             listener.notify(event)
 
@@ -59,6 +65,14 @@ class GameStartedEvent(Event):
         self.name = "Game Started Event"
 
 
+# Initialize game events
+class BoardBuildEvent(Event):
+    def __init__(self, board):
+        super().__init__()
+        self.name = "Build Board Event"
+        self.board = board
+
+
 # superior event for buttons
 class ButtonEvent(Event):
     def __init__(self):
@@ -82,9 +96,9 @@ class CPUSpinnerController:
         clock = pygame.time.Clock()
         elapsed = 0
         while self.going:
-            clock.tick(100)
             event = TickEvent()
             self.event_manager.post(event)
+            clock.tick(100)
             elapsed += 1
 
     def notify(self, event):
@@ -109,10 +123,14 @@ class MouseController:
             for ev in pygame.event.get():
                 event_to_send = None
 
+                if ev.type == pygame.QUIT:
+                        event_to_send = QuitEvent()
                 # left mouse button
-                if ev.type == pygame.MOUSEBUTTONDOWN:
+                elif ev.type == pygame.MOUSEBUTTONDOWN:
                     if ev.button == 1:
                         event_to_send = MouseEventHandler.get_event_from_coordinates(ev.pos)
                         pass
+
                 if event_to_send:
                     self.event_manager.post(event_to_send)
+
