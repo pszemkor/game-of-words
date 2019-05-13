@@ -119,6 +119,13 @@ class ConfirmButtonPressedEvent(Event):
         self.name = "ConfirmButtonPressedEvent"
 
 
+class UpdateFieldEvent(Event):
+    def __init__(self, field):
+        super().__init__()
+        self.name = "UpdateFieldEvent"
+        self.field = field
+
+
 # #################################################################
 
 class ScreenState(Enum):

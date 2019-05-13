@@ -200,8 +200,12 @@ class Game:
 
     def notify(self, event):
         if isinstance(event, controller.SelectBoardFieldEvent):
-            self.board.set_active_field(self.board.get_field_from_coords(event.coords))
-            ev = controller.BoardBuildEvent(self.board)
+            field = self.board.get_field_from_coords(event.coords)
+            if field.is_active:
+                self.board.set_active_field(None)
+            else:
+                self.board.set_active_field(field)
+            ev = controller.UpdateFieldEvent(field)
             self.ev_manager.post(ev)
 
 class FieldState(Enum):

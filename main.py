@@ -6,8 +6,6 @@ import controller
 # IMPORTANT - pygame.event.get() deletes read events, so be careful with the order of Controllers in event manager
 
 def main():
-    # field = model.Field(3)
-    # print(field)
 
     ev_manager = controller.EventManager()
     game_view = view.GameView(ev_manager)
