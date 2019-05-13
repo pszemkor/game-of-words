@@ -15,8 +15,10 @@ def main():
     cpu_spinner = controller.CPUSpinnerController(ev_manager)
 
     ##### DEBUG
-    game.players.append(model.Player())
-    # print(game.players)
+    player = model.Player()
+    game.players.append(player)
+    game.set_active_player(player)
+    # print(game.players)s
     game.players[0].tilebox.fields[1].place_tile(model.Tile('A'))
     ev_manager.post(controller.TileBoxBuildEvent(game.players[0].tilebox))
 

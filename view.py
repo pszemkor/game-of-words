@@ -14,24 +14,6 @@ class FieldSprite(pygame.sprite.Sprite):
         self.field = field
         self.image = pygame.Surface(config.FIELD_RECTANGLE)
         self.update()
-        # if field.is_active:
-        #     self.image.fill((255, 255, 0))
-        # else:
-        #     self.image.fill((0, 255, 255))
-        #
-        # if field.state is model.FieldState.FIXED:
-        #     self.image.fill((200, 50, 0))
-        #     font = pygame.font.Font(None, config.FIELD_RECTANGLE[0])
-        #     text = field.tile.__str__()
-        #     text_img = font.render(text, 1, (255, 255, 255))
-        #     text_rec = text_img.get_rect(center=(config.FIELD_RECTANGLE[0] // 2, config.FIELD_RECTANGLE[0] // 2))
-        #     self.image.blit(text_img, text_rec)
-        # elif field.state is model.FieldState.TEMPORARY:
-        #     font = pygame.font.Font(None, config.FIELD_RECTANGLE[0])
-        #     text = field.tile.__str__()
-        #     text_img = font.render(text, 1, (255, 255, 255))
-        #     text_rec = text_img.get_rect(center=(config.FIELD_RECTANGLE[0] // 2, config.FIELD_RECTANGLE[0] // 2))
-        #     self.image.blit(text_img, text_rec)
 
     def update(self):
         if self.field.is_active:
@@ -143,7 +125,5 @@ class GameView:
             self.show_board(event.board)
         elif isinstance(event, controller.TileBoxBuildEvent):
             self.show_tilebox(event.tilebox)
-        elif isinstance(event, controller.UpdateFieldEvent):
-            self.get_field_sprite(event.field)
         elif isinstance(event, controller.UpdateFieldEvent):
             self.get_field_sprite(event.field)
