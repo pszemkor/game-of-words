@@ -15,8 +15,15 @@ class FieldSprite(pygame.sprite.Sprite):
         self.image = pygame.Surface(config.FIELD_RECTANGLE)
         self.image.fill((0, 255, 255))
 
-        if field.state is not model.FieldState.EMPTY:
+        if field.state is model.FieldState.FIXED:
             self.image.fill((200, 50, 0))
+            font = pygame.font.Font(None, config.FIELD_RECTANGLE[0])
+            text = field.tile.__str__()
+            text_img = font.render(text, 1, (255, 255, 255))
+            text_rec = text_img.get_rect(center=(config.FIELD_RECTANGLE[0] // 2, config.FIELD_RECTANGLE[0] // 2))
+            self.image.blit(text_img, text_rec)
+        elif field.state is model.FieldState.TEMPORARY:
+            self.image.fill((55, 55, 0))
             font = pygame.font.Font(None, config.FIELD_RECTANGLE[0])
             text = field.tile.__str__()
             text_img = font.render(text, 1, (255, 255, 255))
@@ -56,7 +63,8 @@ class GameView:
         pygame.display.flip()
 
         field_rect = pygame.Rect(
-            (config.LEFT_EDGE_BOARD_OFFSET, config.TOP_EDGE_BOARD_OFFSET, config.FIELD_RECTANGLE[0], config.FIELD_RECTANGLE[0]))
+            (config.LEFT_EDGE_BOARD_OFFSET, config.TOP_EDGE_BOARD_OFFSET, config.FIELD_RECTANGLE[0],
+             config.FIELD_RECTANGLE[0]))
 
         column = 0
 
@@ -66,7 +74,8 @@ class GameView:
                     field_rect = field_rect.move(config.FIELD_RECTANGLE_WIDTH, 0)
                 else:
                     column = 0
-                    field_rect = field_rect.move(-(config.BOARD_SIZE - 1) * config.FIELD_RECTANGLE_WIDTH, config.FIELD_RECTANGLE_WIDTH)
+                    field_rect = field_rect.move(-(config.BOARD_SIZE - 1) * config.FIELD_RECTANGLE_WIDTH,
+                                                 config.FIELD_RECTANGLE_WIDTH)
                 column += 1
                 new_field_sprite = FieldSprite(field, self.back_sprites)
                 new_field_sprite.rect = field_rect
@@ -75,7 +84,8 @@ class GameView:
     def show_tilebox(self, tilebox):
 
         field_rect = pygame.Rect(
-            (config.LEFT_EDGE_TILEBOX_OFFSET, config.TOP_EDGE_TILEBOX_OFFSET, config.FIELD_RECTANGLE[0], config.FIELD_RECTANGLE[0]))
+            (config.LEFT_EDGE_TILEBOX_OFFSET, config.TOP_EDGE_TILEBOX_OFFSET, config.FIELD_RECTANGLE[0],
+             config.FIELD_RECTANGLE[0]))
 
         column = 0
         for field in tilebox.fields:
@@ -88,7 +98,6 @@ class GameView:
             new_field_sprite = FieldSprite(field, self.back_sprites)
             new_field_sprite.rect = field_rect
             new_field_sprite = None
-
 
     def draw_everything(self):
         self.back_sprites.clear(self.window, self.background)
