@@ -1,5 +1,6 @@
 import view
 
+
 class Event:
     def __init__(self):
         self.name = "Generic event"
@@ -105,3 +106,21 @@ class VerifyBoardEvent(Event):
         super().__init__()
         self.name = "VerifyBoardEvent"
         self.board = board
+
+
+class MoveRejectedEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "MoveRejectedEvent"
+
+
+class AIPlayerMoveStartedEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "AIPlayerMoveStartedEvent"
+
+
+class AIPlayerMoveEndedEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "AIPlayerMoveEndedEvent"

@@ -7,7 +7,6 @@ import view
 import model
 
 
-
 class ScreenState(Enum):
     MENU = 0
     GAME = 1
@@ -99,8 +98,8 @@ class MouseController:
     def notify(self, event):
         if isinstance(event, events.TickEvent):
             for ev in pygame.event.get():
-                event_to_send = None
 
+                event_to_send = None
                 if ev.type == pygame.QUIT:
                     event_to_send = events.QuitEvent()
                 # left mouse button

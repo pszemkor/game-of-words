@@ -86,9 +86,28 @@ class BagOfLetters:
                                   "d": 4, "k": 1, "l": 4, "m": 2, "p": 2, "t": 6, "y": 2, "b": 2, "g": 3, "h": 2,
                                   "j": 1, "u": 4, "f": 2, "q": 1, "x": 1, "v": 2, "?": 2}
 
-    # game has 2 players, board, possible_words  and validator
+    def __letters_left(self):
+        return sum(self.available_letters.values())
+
+    def __get_random_letter(self):
+        import random
+        keys = list(map(lambda tuple: tuple[0], filter(lambda item: item[1] != 0, self.available_letters.items())))
+        print(keys)
+        index = random.randint(0, len(keys) - 1)
+        self.available_letters[keys[index]] -= 1
+        return keys[index]
+
+    def get_new_letters(self, amount):
+        left = self.__letters_left()
+        upper_limit = amount if left > amount else left
+        new_letters = []
+        for i in range(upper_limit):
+            new_letters.append(self.__get_random_letter())
+        return new_letters
 
 
+
+# game has 2 players, board, possible_words  and validator
 class Game:
     def __init__(self, ev_manager):
         self.ev_manager = ev_manager
@@ -147,16 +166,22 @@ class Game:
             print('Clicked that MAGIC BUTTON!!!')
             # validation
             try:
-                print(self.validator.verify_board(self.board))
+                self.active_player.score += self.validator.verify_board(self.board)
             except Exception as e:
                 print(str(e))
-                print("exception message")
+                self.ev_manager.post(events.MoveRejectedEvent())
 
+            self.ev_manager.post(events.AIPlayerMoveStartedEvent)
+            # todo -> AI move
+            import time
+            time.sleep(3)
+            self.ev_manager.post(events.AIPlayerMoveEndedEvent())
 
     def set_active_player(self, player):
         if player in self.players:
             self.active_player = player
-    # todo -> add exception - player passed to become active is not in the list of players
+        else:
+            raise Exception("Chosen player is not in game!")
 
 
 class FieldGroup(Enum):
