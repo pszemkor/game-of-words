@@ -132,7 +132,6 @@ class Board(FieldsContainer):
         self.fields = [[Field(0) for i in range(config.BOARD_SIZE)] for j in range(config.BOARD_SIZE)]
         self.ev_manager = ev_manager
         self.ev_manager.register(self)
-        self.active_field = None
 
         event_to_send = controller.BoardBuildEvent(self)
         self.ev_manager.post(event_to_send)
@@ -199,6 +198,9 @@ class Game:
         self.bags_of_letters = BagOfLetters()
         self.turn = None
 
+        ev = controller.DrawGameButtonsEvent()
+        self.ev_manager.post(ev)
+
     def __str__(self):
         return self.board.__str__()
 
@@ -238,6 +240,9 @@ class Game:
                 self.active_player.tilebox.set_active_field(field)
             ev = controller.UpdateFieldEvent(field)
             self.ev_manager.post(ev)
+        elif isinstance(event, controller.ConfirmButtonPressedEvent):
+            print('Clicked that MAGIC BUTTON!!!')
+    #         todo -> just finish the rest of the game, seems to easy for me
 
     def set_active_player(self, player):
         if player in self.players:
@@ -312,7 +317,6 @@ class TileBox(FieldsContainer):
     def __init__(self):
         super().__init__()
         self.fields = [Field(0) for i in range(config.TILEBOX_SIZE)]
-        self.active_field = None
 
     def get_field_from_coords(self, coords):
         return self.fields[coords[0]]

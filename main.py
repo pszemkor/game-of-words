@@ -20,6 +20,7 @@ def main():
     game.set_active_player(player)
     # print(game.players)s
     game.players[0].tilebox.fields[1].place_tile(model.Tile('A'))
+    game.players[0].tilebox.fields[0].place_tile(model.Tile('B'))
     ev_manager.post(controller.TileBoxBuildEvent(game.players[0].tilebox))
 
     #######

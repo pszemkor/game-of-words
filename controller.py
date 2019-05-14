@@ -102,7 +102,16 @@ class ButtonEvent(Event):
         self.name = "Button Event"
 
 
-class ConfirmButtonEvent(Event):
+class DrawGameButtonsEvent(ButtonEvent):
+    def __init__(self):
+        super().__init__()
+        self.name = 'DrawGameButtonsEvent'
+        confirm_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Confirm', 20, (240, 0, 240), (100, 30), 800, 650)
+        self.buttons = []
+        self.buttons.append(confirm_button)
+
+
+class ConfirmButtonEvent(ButtonEvent):
     def __init__(self):
         super().__init__()
         self.name = "ConfirmButtonEvent"
@@ -185,7 +194,9 @@ class MouseEventHandler:
             elif hasattr(sprite, 'field') and sprite.field in self.game.active_player.tilebox.fields:
                 ev_to_send = SelectFieldEvent(sprite.field, model.FieldGroup.TILEBOX)
                 return ev_to_send
-
+            elif hasattr(sprite, 'button') and sprite.button.text == 'Confirm':
+                ev_to_send = ConfirmButtonPressedEvent()
+                return ev_to_send
 
 
 class MouseController:
