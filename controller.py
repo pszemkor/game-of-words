@@ -11,6 +11,14 @@ def Debug(msg):
     print(msg)
 
 
+def In2dArray(array, el_searched):
+    for row in array:
+        for e in row:
+            if e == el_searched:
+                return True
+    return False
+
+
 class EventManager:
     def __init__(self):
         from weakref import WeakKeyDictionary
@@ -94,17 +102,27 @@ class ButtonEvent(Event):
         self.name = "Button Event"
 
 
-class ConfirmButtonEvent(Event):
+class DrawGameButtonsEvent(ButtonEvent):
+    def __init__(self):
+        super().__init__()
+        self.name = 'DrawGameButtonsEvent'
+        confirm_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Confirm', 20, (240, 0, 240), (100, 30), 800, 650)
+        self.buttons = []
+        self.buttons.append(confirm_button)
+
+
+class ConfirmButtonEvent(ButtonEvent):
     def __init__(self):
         super().__init__()
         self.name = "ConfirmButtonEvent"
 
 
 class SelectFieldEvent(Event):
-    def __init__(self, coords, field_group):
+    def __init__(self, field, field_group):
         super().__init__()
         self.name = "SelectFieldEvent"
-        self.coords = coords
+        # self.coords = coords
+        self.field = field
         self.field_group = field_group
 
 
@@ -162,41 +180,31 @@ class CPUSpinnerController:
             self.going = False
 
 
-# todo -> check coordinates and set event_to_sent (it depends on coordinates)
 class MouseEventHandler:
-    def __init__(self, event_manager):
+    def __init__(self, event_manager, game):
         self.event_manager = event_manager
+        self.game = game
 
-    def get_event_from_coordinates(self, coords):
+    def get_event_from_clicked_sprites(self, sprites):
         if self.event_manager.screen_state == ScreenState.GAME:
-            print(coords)
-            # board area
-            if coords[0] in range(config.LEFT_EDGE_BOARD_OFFSET, config.LEFT_EDGE_BOARD_OFFSET + config.BOARD_WIDTH) \
-                    and coords[1] in range(config.TOP_EDGE_BOARD_OFFSET,
-                                           config.TOP_EDGE_BOARD_OFFSET + config.BOARD_WIDTH):
-                field_coords = [0, 0]
-                field_coords[0] = (coords[0] - config.LEFT_EDGE_BOARD_OFFSET) // config.FIELD_RECTANGLE_WIDTH
-                field_coords[1] = (coords[1] - config.TOP_EDGE_BOARD_OFFSET) // config.FIELD_RECTANGLE_WIDTH
-                ev_to_send = SelectFieldEvent(field_coords, model.FieldGroup.BOARD)
-                print('Plansza!!', field_coords[0], field_coords[1])
+            sprite = sprites[0]
+            if hasattr(sprite, 'field') and In2dArray(self.game.board.fields, sprite.field):
+                ev_to_send = SelectFieldEvent(sprite.field, model.FieldGroup.BOARD)
                 return ev_to_send
-            # tilebox area
-            elif coords[0] in range(config.LEFT_EDGE_TILEBOX_OFFSET,
-                                    config.LEFT_EDGE_TILEBOX_OFFSET + config.TILEBOX_WIDTH) \
-                    and coords[1] in range(config.TOP_EDGE_TILEBOX_OFFSET,
-                                           config.TOP_EDGE_TILEBOX_OFFSET + config.TILEBOX_WIDTH):
-                print('Tile box!')
-                field_coords = [0]
-                field_coords[0] = (coords[0] - config.LEFT_EDGE_TILEBOX_OFFSET) // config.FIELD_RECTANGLE_WIDTH
-                ev_to_send = SelectFieldEvent(field_coords, model.FieldGroup.TILEBOX)
+            elif hasattr(sprite, 'field') and sprite.field in self.game.active_player.tilebox.fields:
+                ev_to_send = SelectFieldEvent(sprite.field, model.FieldGroup.TILEBOX)
+                return ev_to_send
+            elif hasattr(sprite, 'button') and sprite.button.text == 'Confirm':
+                ev_to_send = ConfirmButtonPressedEvent()
                 return ev_to_send
 
 
 class MouseController:
-    def __init__(self, event_manager):
+    def __init__(self, event_manager, view, game):
         self.event_manager = event_manager
         self.event_manager.register(self)
-        self.mouse_event_handler = MouseEventHandler(self.event_manager)
+        self.mouse_event_handler = MouseEventHandler(self.event_manager, game)
+        self.view = view
 
     def notify(self, event):
         if isinstance(event, TickEvent):
@@ -206,9 +214,12 @@ class MouseController:
                 if ev.type == pygame.QUIT:
                     event_to_send = QuitEvent()
                 # left mouse button
-                elif ev.type == pygame.MOUSEBUTTONDOWN:
+                elif ev.type == pygame.MOUSEBUTTONUP:
                     if ev.button == 1:
-                        event_to_send = self.mouse_event_handler.get_event_from_coordinates(ev.pos)
+                        all_sprites = list(self.view.back_sprites) + list(self.view.front_sprites)
+                        clicked_sprites = [s for s in all_sprites if s.rect.collidepoint(ev.pos)]
+                        if len(clicked_sprites) > 0:
+                            event_to_send = self.mouse_event_handler.get_event_from_clicked_sprites(clicked_sprites)
                         pass
 
                 if event_to_send:
