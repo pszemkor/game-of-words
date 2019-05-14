@@ -53,7 +53,8 @@ class ButtonSprite(pygame.sprite.Sprite):
             text_rec = text_img.get_rect(center=(self.button.shape[0] // 2, self.button.shape[1] // 2))
             self.image.blit(text_img, text_rec)
         elif self.button.type is ButtonShapeType.CIRCLE:
-            pygame.draw.circle(self.image, self.button.bg_color, self.button.shape[0] // 2, self.button.shape[0] // 2)
+            pygame.draw.circle(self.image, self.button.bg_color, (self.button.shape[0] // 2, self.button.shape[0] // 2),
+                               self.button.shape[0] // 2)
             font = pygame.font.Font(None, self.button.font_size)
             text_img = font.render(self.button.text, 1, (255, 255, 255))
             text_rec = text_img.get_rect(center=(self.button.shape[0] // 2, self.button.shape[0] // 2))
@@ -128,8 +129,6 @@ class GameView:
                 new_field_sprite = FieldSprite(field, self.back_sprites)
                 new_field_sprite.rect = field_rect
                 new_field_sprite = None
-
-
 
     def show_tilebox(self, tilebox):
         field_rect = pygame.Rect(
