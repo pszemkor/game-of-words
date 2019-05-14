@@ -32,7 +32,7 @@ class Board(FieldsContainer):
     def __init__(self, ev_manager):
         # board with zeros
         super().__init__()
-        self.fields = [[Field(0) for i in range(config.BOARD_SIZE)] for j in range(config.BOARD_SIZE)]
+        self.fields = [[Field(1) for i in range(config.BOARD_SIZE)] for j in range(config.BOARD_SIZE)]
         self.ev_manager = ev_manager
         self.ev_manager.register(self)
 
@@ -198,6 +198,7 @@ class Field:
 class Tile:
     def __init__(self, character):
         self.character = character
+        self.character = self.character.lower()
 
     def __str__(self):
         return self.character
