@@ -92,7 +92,6 @@ class BagOfLetters:
     def __get_random_letter(self):
         import random
         keys = list(map(lambda tuple: tuple[0], filter(lambda item: item[1] != 0, self.available_letters.items())))
-        print(keys)
         index = random.randint(0, len(keys) - 1)
         self.available_letters[keys[index]] -= 1
         return keys[index]
@@ -104,7 +103,6 @@ class BagOfLetters:
         for i in range(upper_limit):
             new_letters.append(self.__get_random_letter())
         return new_letters
-
 
 
 # game has 2 players, board, possible_words  and validator
@@ -170,12 +168,16 @@ class Game:
             except Exception as e:
                 print(str(e))
                 self.ev_manager.post(events.MoveRejectedEvent())
-
-            self.ev_manager.post(events.AIPlayerMoveStartedEvent)
+                return
+            # ai move
+            self.ev_manager.post(events.AIPlayerMoveStartedEvent())
             # todo -> AI move
             import time
             time.sleep(3)
             self.ev_manager.post(events.AIPlayerMoveEndedEvent())
+
+            # getting letters from bag-of-letters:
+            # todo -> keep track of used letters ???
 
     def set_active_player(self, player):
         if player in self.players:

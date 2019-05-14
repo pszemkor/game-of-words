@@ -16,20 +16,18 @@ class FieldSprite(pygame.sprite.Sprite):
         self.image = pygame.Surface(config.FIELD_RECTANGLE)
         self.update()
 
-    # just for DRY principle :p
     def __field_colouring(self):
         font = pygame.font.Font(None, config.FIELD_RECTANGLE[0])
         text = self.field.tile.__str__()
-        text_img = font.render(text, 1, (255, 255, 255))
+        text_img = font.render(text, 1, (0, 0, 0))
         text_rec = text_img.get_rect(center=(config.FIELD_RECTANGLE[0] // 2, config.FIELD_RECTANGLE[0] // 2))
         self.image.blit(text_img, text_rec)
 
     def update(self):
-
         if self.field.is_active:
             self.image.fill((255, 255, 0))
         else:
-            self.image.fill((0, 255, 255))
+            self.image.fill((50, 205, 50))
 
         if self.field.state is model.FieldState.FIXED:
             self.image.fill((200, 50, 0))
