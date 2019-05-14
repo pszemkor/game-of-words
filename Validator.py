@@ -74,30 +74,41 @@ class Validator:
                         self.check_if_one_line(first_temp_coord, (i, j))
                     temps.append((i, j))
 
+        if len(temps) == 0:
+            raise Exception("None tile has been put!")
+
         horizontal_sorted = sorted(temps, key=lambda x: x[1])
         vertical_sorted = None
+        print(horizontal_sorted)
         if len(horizontal_sorted) > 1 and horizontal_sorted[0][1] == horizontal_sorted[1][1]:
             vertical_sorted = sorted(temps, key=lambda x: x[0])
+            print(vertical_sorted)
 
         word_to_check = ""
         if vertical_sorted is None:
             x = horizontal_sorted[0][0]
             word_to_check += self.get_behind_temp_horizontal(board, horizontal_sorted[0][1])
-            for y in range(horizontal_sorted[0][1], horizontal_sorted[len(horizontal_sorted) - 1][1]):
+            print(word_to_check)
+            for y in range(horizontal_sorted[0][1], horizontal_sorted[len(horizontal_sorted) - 1][1] + 1):
                 if board.fields[x][y].state == model.FieldState.EMPTY:
                     raise Exception("Tiles not in one word")
                 word_to_check += board.fields[x][y].tile.character
+            print(word_to_check)
             word_to_check += self.get_after_temp_horizontal(board, horizontal_sorted[0][1])
+            print(word_to_check)
         else:
             y = vertical_sorted[0][1]
             word_to_check += self.get_behind_temp_vertical(board, vertical_sorted[0][0])
-            for x in range(vertical_sorted[0][0], vertical_sorted[len(vertical_sorted) - 1][0]):
+            for x in range(vertical_sorted[0][0], vertical_sorted[len(vertical_sorted) - 1][0] + 1):
                 if board.fields[x][y].state == model.FieldState.EMPTY:
                     raise Exception("Tiles not in one word")
                 word_to_check += board.fields[x][y].tile.character
             word_to_check += self.get_after_temp_vertical(board, vertical_sorted[0][0])
-        if self.check_word(word_to_check):
+        word_to_check.lower()
+        if self.check_word(word_to_check.lower()):
             return len(word_to_check)
+        else:
+            raise Exception("Word does not exist!")
 
     def notify(self, board):
         return self.verify_board(board)

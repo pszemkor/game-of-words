@@ -152,10 +152,6 @@ class Game:
                 print(str(e))
                 print("exception message")
 
-            print("ab" in self.dictionary.possible_words)
-            print("hello" in self.dictionary.possible_words)
-            print("dog" in self.dictionary.possible_words)
-            print("ace" in self.dictionary.possible_words)
 
     def set_active_player(self, player):
         if player in self.players:

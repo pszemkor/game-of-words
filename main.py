@@ -19,8 +19,11 @@ def main():
     game.players.append(player)
     game.set_active_player(player)
     # print(game.players)s
-    game.players[0].tilebox.fields[1].place_tile(model.Tile('A'))
-    game.players[0].tilebox.fields[0].place_tile(model.Tile('B'))
+    game.players[0].tilebox.fields[0].place_tile(model.Tile('A'))
+    game.players[0].tilebox.fields[1].place_tile(model.Tile('E'))
+    game.players[0].tilebox.fields[2].place_tile(model.Tile('C'))
+    game.players[0].tilebox.fields[3].place_tile(model.Tile('S'))
+    game.players[0].tilebox.fields[4].place_tile(model.Tile('E'))
     ev_manager.post(events.TileBoxBuildEvent(game.players[0].tilebox))
     #######
 
