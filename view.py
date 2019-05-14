@@ -3,7 +3,7 @@
 
 import pygame
 from enum import Enum
-
+import controller_events as events
 import config
 import controller
 import model
@@ -16,6 +16,14 @@ class FieldSprite(pygame.sprite.Sprite):
         self.image = pygame.Surface(config.FIELD_RECTANGLE)
         self.update()
 
+    # just for DRY principle :p
+    def __field_colouring(self):
+        font = pygame.font.Font(None, config.FIELD_RECTANGLE[0])
+        text = self.field.tile.__str__()
+        text_img = font.render(text, 1, (255, 255, 255))
+        text_rec = text_img.get_rect(center=(config.FIELD_RECTANGLE[0] // 2, config.FIELD_RECTANGLE[0] // 2))
+        self.image.blit(text_img, text_rec)
+
     def update(self):
 
         if self.field.is_active:
@@ -25,17 +33,9 @@ class FieldSprite(pygame.sprite.Sprite):
 
         if self.field.state is model.FieldState.FIXED:
             self.image.fill((200, 50, 0))
-            font = pygame.font.Font(None, config.FIELD_RECTANGLE[0])
-            text = self.field.tile.__str__()
-            text_img = font.render(text, 1, (255, 255, 255))
-            text_rec = text_img.get_rect(center=(config.FIELD_RECTANGLE[0] // 2, config.FIELD_RECTANGLE[0] // 2))
-            self.image.blit(text_img, text_rec)
+            self.__field_colouring()
         elif self.field.state is model.FieldState.TEMPORARY:
-            font = pygame.font.Font(None, config.FIELD_RECTANGLE[0])
-            text = self.field.tile.__str__()
-            text_img = font.render(text, 1, (255, 255, 255))
-            text_rec = text_img.get_rect(center=(config.FIELD_RECTANGLE[0] // 2, config.FIELD_RECTANGLE[0] // 2))
-            self.image.blit(text_img, text_rec)
+            self.__field_colouring()
 
 
 class ButtonSprite(pygame.sprite.Sprite):
@@ -45,20 +45,22 @@ class ButtonSprite(pygame.sprite.Sprite):
         self.image = pygame.Surface(self.button.shape)
         self.update()
 
+    # DRY util
+    def __blit(self):
+        font = pygame.font.Font(None, self.button.font_size)
+        text_img = font.render(self.button.text, 1, (255, 255, 255))
+        text_rec = text_img.get_rect(center=(self.button.shape[0] // 2, self.button.shape[1] // 2))
+        self.image.blit(text_img, text_rec)
+
     def update(self):
         if self.button.type is ButtonShapeType.RECTANGLE:
             self.image.fill(self.button.bg_color)
-            font = pygame.font.Font(None, self.button.font_size)
-            text_img = font.render(self.button.text, 1, (255, 255, 255))
-            text_rec = text_img.get_rect(center=(self.button.shape[0] // 2, self.button.shape[1] // 2))
-            self.image.blit(text_img, text_rec)
+            self.__blit()
+
         elif self.button.type is ButtonShapeType.CIRCLE:
             pygame.draw.circle(self.image, self.button.bg_color, (self.button.shape[0] // 2, self.button.shape[0] // 2),
                                self.button.shape[0] // 2)
-            font = pygame.font.Font(None, self.button.font_size)
-            text_img = font.render(self.button.text, 1, (255, 255, 255))
-            text_rec = text_img.get_rect(center=(self.button.shape[0] // 2, self.button.shape[0] // 2))
-            self.image.blit(text_img, text_rec)
+            self.__blit()
 
 
 class ButtonShapeType(Enum):
@@ -107,9 +109,9 @@ class GameView:
         self.window.blit(self.background, (0, 0))
         pygame.display.flip()
 
-        field_rect = pygame.Rect(
-            (config.LEFT_EDGE_BOARD_OFFSET - config.FIELD_RECTANGLE_WIDTH, config.TOP_EDGE_BOARD_OFFSET,
-             config.FIELD_RECTANGLE[0], config.FIELD_RECTANGLE[0]))
+        # field_rect = pygame.Rect(
+        #     (config.LEFT_EDGE_BOARD_OFFSET - config.FIELD_RECTANGLE_WIDTH, config.TOP_EDGE_BOARD_OFFSET,
+        #      config.FIELD_RECTANGLE[0], config.FIELD_RECTANGLE[0]))
 
         column = 0
 
@@ -128,7 +130,7 @@ class GameView:
                 column += 1
                 new_field_sprite = FieldSprite(field, self.back_sprites)
                 new_field_sprite.rect = field_rect
-                new_field_sprite = None
+                # new_field_sprite = None
 
     def show_tilebox(self, tilebox):
         field_rect = pygame.Rect(
@@ -136,12 +138,12 @@ class GameView:
              config.FIELD_RECTANGLE[0],
              config.FIELD_RECTANGLE[0]))
 
-        column = 0
+        # column = 0
         for field in tilebox.fields:
             field_rect = field_rect.move(config.FIELD_RECTANGLE_WIDTH, 0)
             new_field_sprite = FieldSprite(field, self.back_sprites)
             new_field_sprite.rect = field_rect
-            new_field_sprite = None
+            # new_field_sprite = None
 
     # buttons are drawn in the foreground
     def show_button(self, button):
@@ -176,13 +178,13 @@ class GameView:
                 return sprite
 
     def notify(self, event):
-        if isinstance(event, controller.TickEvent):
+        if isinstance(event, events.TickEvent):
             self.draw_everything()
-        elif isinstance(event, controller.BoardBuildEvent):
+        elif isinstance(event, events.BoardBuildEvent):
             self.show_board(event.board)
-        elif isinstance(event, controller.TileBoxBuildEvent):
+        elif isinstance(event, events.TileBoxBuildEvent):
             self.show_tilebox(event.tilebox)
-        elif isinstance(event, controller.UpdateFieldEvent):
+        elif isinstance(event, events.UpdateFieldEvent):
             self.get_field_sprite(event.field)
-        elif isinstance(event, controller.DrawGameButtonsEvent):
+        elif isinstance(event, events.DrawGameButtonsEvent):
             self.show_buttons(event.buttons)

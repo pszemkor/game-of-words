@@ -1,12 +1,12 @@
 import model
 import view
 import controller
+import controller_events as events
 
 
 # IMPORTANT - pygame.event.get() deletes read events, so be careful with the order of Controllers in event manager
 
 def main():
-
     ev_manager = controller.EventManager()
     game_view = view.GameView(ev_manager)
     game = model.Game(ev_manager)
@@ -21,8 +21,7 @@ def main():
     # print(game.players)s
     game.players[0].tilebox.fields[1].place_tile(model.Tile('A'))
     game.players[0].tilebox.fields[0].place_tile(model.Tile('B'))
-    ev_manager.post(controller.TileBoxBuildEvent(game.players[0].tilebox))
-
+    ev_manager.post(events.TileBoxBuildEvent(game.players[0].tilebox))
     #######
 
     cpu_spinner.run()
