@@ -6,7 +6,7 @@ import controller_events as events
 from enum import Enum
 import config
 import controller
-from Validator import Validator
+from validator import Validator
 
 
 # todo -> algo do "AI"
