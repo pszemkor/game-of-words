@@ -89,11 +89,11 @@ class MouseEventHandler:
 
 
 class MouseController:
-    def __init__(self, event_manager, view, game):
+    def __init__(self, event_manager, view_, game):
         self.event_manager = event_manager
         self.event_manager.register(self)
         self.mouse_event_handler = MouseEventHandler(self.event_manager, game)
-        self.view = view
+        self.view = view_
 
     def notify(self, event):
         if isinstance(event, events.TickEvent):
