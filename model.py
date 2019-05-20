@@ -373,6 +373,7 @@ class AIPlayer(Player):
     #         todo -> POST PASS
 
     def get_all_possible_words(self):
+
         pass
 
     def __can_be_anchor(self, coords):
