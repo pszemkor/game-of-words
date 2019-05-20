@@ -15,24 +15,27 @@ def main():
     mouse_controller = controller.MouseController(ev_manager, game_view, game)
     cpu_spinner = controller.CPUSpinnerController(ev_manager)
 
-    human_player = model.Player()
+    human_player = model.Player(game)
+
     game.players.append(human_player)
     game.set_active_player(human_player)
 
-    cpu_player = model.Player()
+    cpu_player = model.AIPlayer(game)
     game.players.append(cpu_player)
+    game.main_player = game.players[0]
+    ev_manager.post(events.NextPlayerMoveStartedEvent(game))
 
-    init_letters_player = game.bags_of_letters.get_new_letters(config.TILEBOX_SIZE)
-    i = 0
-    for l in init_letters_player:
-        game.players[0].tilebox.fields[i].place_tile(model.Tile(l))
-        i += 1
-
-    i = 0
-    init_letters_cpu = game.bags_of_letters.get_new_letters(config.TILEBOX_SIZE)
-    for l in init_letters_player:
-        game.players[1].tilebox.fields[i].place_tile(model.Tile(l))
-        i += 1
+    # init_letters_player = game.bags_of_letters.get_new_letters(config.TILEBOX_SIZE)
+    # i = 0
+    # for l in init_letters_player:
+    #     game.players[0].tilebox.fields[i].place_tile(model.Tile(l))
+    #     i += 1
+    #
+    # i = 0
+    # init_letters_cpu = game.bags_of_letters.get_new_letters(config.TILEBOX_SIZE)
+    # for l in init_letters_player:
+    #     game.players[1].tilebox.fields[i].place_tile(model.Tile(l))
+    #     i += 1
 
     # print(game.players)
     # game.players[0].tilebox.fields[0].place_tile(model.Tile('A'))
@@ -41,7 +44,7 @@ def main():
     # game.players[0].tilebox.fields[3].place_tile(model.Tile('S'))
     # game.players[0].tilebox.fields[4].place_tile(model.Tile('E'))
 
-    ev_manager.post(events.TileBoxBuildEvent(game.players[0].tilebox))
+    # ev_manager.post(events.TileBoxBuildEvent(game.players[0].tilebox))
     cpu_spinner.run()
 
 

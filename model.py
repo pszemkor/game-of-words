@@ -35,9 +35,9 @@ class Board(FieldsContainer):
         self.fields = [[Field(1) for i in range(config.BOARD_SIZE)] for j in range(config.BOARD_SIZE)]
         self.ev_manager = ev_manager
         self.ev_manager.register(self)
-
-        event_to_send = events.BoardBuildEvent(self)
-        self.ev_manager.post(event_to_send)
+        #
+        # event_to_send = events.BoardBuildEvent(self)
+        # self.ev_manager.post(event_to_send)
 
     def __str__(self):
         string = ""
@@ -98,9 +98,9 @@ class BagOfLetters:
 
     def get_new_letters(self, amount):
         left = self.__letters_left()
-        upper_limit = amount if left > amount else left
+        limit = amount if left > amount else left
         new_letters = []
-        for i in range(upper_limit):
+        for i in range(limit):
             new_letters.append(self.__get_random_letter())
         return new_letters
 
@@ -110,7 +110,7 @@ class Game:
     def __init__(self, ev_manager):
         self.ev_manager = ev_manager
         self.ev_manager.register(self)
-
+        self.main_player = None
         self.board = Board(self.ev_manager)
         self.players = []
         self.active_player = None
@@ -118,14 +118,19 @@ class Game:
         self.bags_of_letters = BagOfLetters()
         self.turn = None
         self.validator = Validator(ev_manager, self.dictionary.possible_words)
-        ev = events.DrawGameButtonsEvent()
-        self.ev_manager.post(ev)
+        # ev = events.DrawGameButtonsEvent()
+        # self.ev_manager.post(ev)
 
     def __str__(self):
         return self.board.__str__()
 
-    def init_player_boxes(self):
-        pass
+    def get_index_of_active_player(self):
+        for i, p in enumerate(self.players):
+            if p == self.active_player:
+                return i
+
+    def index_of_next_player(self):
+        return (self.get_index_of_active_player() + 1) % len(self.players)
 
     def notify(self, event):
         # handle board active field selection
@@ -171,15 +176,33 @@ class Game:
                 self.ev_manager.post(events.MoveRejectedEvent())
                 return
             # todo -> AI move
-            self.set_active_player(self.players[1])
-            self.ev_manager.post(events.NextPlayerMoveStartedEvent())
-            # self.players[1].make_turn()
 
-            self.set_active_player(self.players[0])
-            # self.active_player.refill_tilebox(self.bags_of_letters.get_new_letters(self.active_player.get_empty_fields_count()))
+            self.set_active_player(self.players[self.index_of_next_player()])
+            self.ev_manager.post(events.NextPlayerMoveStartedEvent(self))
 
-            # todo -> refresh tilebox!!!
-            self.ev_manager.post(events.NextPlayerMoveEndedEvent())
+        elif isinstance(event, events.NextPlayerMoveStartedEvent):
+            self.board = event.game.board
+            self.players = event.game.players
+            self.active_player = event.game.active_player
+
+            if event.game.active_player == self.main_player:
+                try:
+                    self.active_player.refill_tilebox()
+                    print("refiled")
+                except Exception as e:
+                    # todo end game
+                    print(str(e))
+                    pass
+
+                self.ev_manager.post(events.DrawGameButtonsEvent())
+                self.ev_manager.post(events.BoardBuildEvent(self.board))
+                self.ev_manager.post(events.TileBoxBuildEvent(self.active_player.tilebox))
+                # todo -> scoreboard build event
+
+            else:
+                # todo -> turn information
+                self.ev_manager.post(events.OtherPlayerTurnEvent())
+                pass
 
     def set_active_player(self, player):
         if player in self.players:
@@ -262,20 +285,31 @@ class TileBox(FieldsContainer):
 
 
 class Player:
-    def __init__(self):
+    def __init__(self, game):
         self.score = 0
         self.tilebox = TileBox()
         self.pass_strike = 0
         self.name = "Default"
+        self.game = game
 
-    def refill_tilebox(self, new_tiles):
-        i = 0
-        for field in self.tilebox.fields:
+    def refill_tilebox(self):
+
+        bag_of_letter = self.game.bags_of_letters
+        wanted_letter_amount = self.get_empty_fields_count()
+        new_tiles = bag_of_letter.get_new_letters(wanted_letter_amount)
+        if len(new_tiles) == 0 and wanted_letter_amount == config.TILEBOX_SIZE:
+            raise Exception("END OF GAME")
+
+        j = 0
+        for i, field in enumerate(self.tilebox.fields):
             if field.state == FieldState.EMPTY:
-                if len(new_tiles) - i <= 0:
+                if len(new_tiles) - j <= 0:
                     return
-                field.tile = new_tiles[i]
-                i += 1
+                # field.tile = Tile(new_tiles[i])
+                self.tilebox.fields[i].tile = Tile(new_tiles[i])
+                self.tilebox.fields[i].state = FieldState.TEMPORARY
+                j += 1
+
 
     def get_empty_fields_count(self):
         count = 0
@@ -283,17 +317,20 @@ class Player:
             if field.state == FieldState.EMPTY:
                 count += 1
         return count
-    
+
     def set_name(self, name):
         self.name = name
-    
+
     def get_name(self):
         return self.name
 
+    def pass_turn(self):
+        pass
+
 
 class AIPlayer(Player):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, game):
+        super().__init__(game)
 
     def make_turn(self):
         import time

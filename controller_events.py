@@ -115,12 +115,13 @@ class MoveRejectedEvent(Event):
 
 
 class NextPlayerMoveStartedEvent(Event):
-    def __init__(self):
+    def __init__(self, game):
         super().__init__()
         self.name = "NextPlayerMoveStartedEvent"
+        self.game = game
 
 
-class NextPlayerMoveEndedEvent(Event):
+class OtherPlayerTurnEvent(Event):
     def __init__(self):
         super().__init__()
-        self.name = "NextPlayerMoveEndedEvent"
+        self.name = "OtherPlayerTurnEvent"
