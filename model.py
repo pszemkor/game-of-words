@@ -350,10 +350,11 @@ class PlacementType(Enum):
 
 
 class AIWord:
-    def __init__(self, word, score, placement_type):
+    def __init__(self, word, score, placement_type, pos_letter_dict):
         self.word = word
         self.score = score
         self.placement_type = placement_type
+        self.pos_letter_dict = pos_letter_dict
 
 
 class AIPlayer(Player):
@@ -365,16 +366,37 @@ class AIPlayer(Player):
         time.sleep(5)
         all_possible_words = self.get_all_possible_words()
         if all_possible_words is not []:
-
+            pass
         else:
             pass
+
     #         todo -> POST PASS
 
     def get_all_possible_words(self):
+
         pass
 
+    def __can_be_anchor(self, coords):
+        (x, y) = coords
+        if self.game.board.fields[x][y].FieldState == FieldState.FIXED:
+            return False
+        x_dirs = [1, 0, -1, 0]
+        y_dirs = [0, 1, 0, -1]
+        for i in range(len(x_dirs)):
+            x_neigh = x + x_dirs[i]
+            y_neigh = y + y_dirs[i]
+            if config.BOARD_SIZE > x_neigh >= 0 and config.BOARD_SIZE > y_neigh >= 0 and \
+                    self.game.board.fields[x_neigh][y_neigh].FieldState == FieldState.FIXED:
+                return True
+            else:
+                return False
+
     def __get_anchors(self):
-        pass
+        anchors = []
+        for i in range(config.BOARD_SIZE):
+            for j in range(config.BOARD_SIZE):
+                if self.__can_be_anchor((i, j)):
+                    anchors.append((i, j))
 
     def __left_part(self, partial_word, limit):
         self.__extend_right_part()
@@ -383,5 +405,8 @@ class AIPlayer(Player):
     def __extend_right_part(self):
         pass
 
-    def place_tiles(self):
-        pass
+    def place_tiles(self, ai_word):
+        self.score += ai_word.score
+        for k, v in ai_word.pos_letter_dict.items():
+            self.game.board.fields[k].place_tile(Tile(k))
+            self.game.board.fields[k].confirm_tile()
