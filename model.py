@@ -209,6 +209,13 @@ class Game:
             else:
                 # todo -> turn information
                 self.ev_manager.post(events.OtherPlayerTurnEvent())
+                if isinstance(self.active_player, AIPlayer):
+                    self.active_player.refill_tilebox()
+                    self.active_player.make_turn()
+                    self.set_active_player(self.players[self.index_of_next_player()])
+                    self.board.fix_all()
+                    print("elo")
+                    self.ev_manager.post(events.NextPlayerMoveStartedEvent(self))
                 pass
 
     def set_active_player(self, player):
@@ -308,12 +315,14 @@ class Player:
             raise Exception("END OF GAME")
 
         j = 0
+        print(new_tiles)
+
         for i, field in enumerate(self.tilebox.fields):
             if field.state == FieldState.EMPTY:
                 if len(new_tiles) - j <= 0:
                     return
                 # field.tile = Tile(new_tiles[i])
-                self.tilebox.fields[i].tile = Tile(new_tiles[i])
+                self.tilebox.fields[i].tile = Tile(new_tiles[j])
                 self.tilebox.fields[i].state = FieldState.TEMPORARY
                 j += 1
 
@@ -341,4 +350,5 @@ class AIPlayer(Player):
 
     def make_turn(self):
         import time
+        print("ALE WAS OGRAM")
         time.sleep(5)
