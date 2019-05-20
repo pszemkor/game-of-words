@@ -114,13 +114,13 @@ class MoveRejectedEvent(Event):
         self.name = "MoveRejectedEvent"
 
 
-class AIPlayerMoveStartedEvent(Event):
+class NextPlayerMoveStartedEvent(Event):
     def __init__(self):
         super().__init__()
-        self.name = "AIPlayerMoveStartedEvent"
+        self.name = "NextPlayerMoveStartedEvent"
 
 
-class AIPlayerMoveEndedEvent(Event):
+class NextPlayerMoveEndedEvent(Event):
     def __init__(self):
         super().__init__()
-        self.name = "AIPlayerMoveEndedEvent"
+        self.name = "NextPlayerMoveEndedEvent"

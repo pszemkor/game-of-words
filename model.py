@@ -165,22 +165,21 @@ class Game:
             # validation
             try:
                 self.active_player.score += self.validator.verify_board(self.board)
+                print(self.active_player.score)
             except Exception as e:
                 print(str(e))
                 self.ev_manager.post(events.MoveRejectedEvent())
                 return
             # todo -> AI move
             self.set_active_player(self.players[1])
-            self.ev_manager.post(events.AIPlayerMoveStartedEvent())
-            # self.players[1].move()
+            self.ev_manager.post(events.NextPlayerMoveStartedEvent())
+            # self.players[1].make_turn()
 
             self.set_active_player(self.players[0])
-            # self.active_player.refill(self.bags_of_letters.get_new_letters(self.active_player.get_empty_fields_count()))
+            # self.active_player.refill_tilebox(self.bags_of_letters.get_new_letters(self.active_player.get_empty_fields_count()))
 
             # todo -> refresh tilebox!!!
-            self.ev_manager.post(events.AIPlayerMoveEndedEvent())
-
-
+            self.ev_manager.post(events.NextPlayerMoveEndedEvent())
 
     def set_active_player(self, player):
         if player in self.players:
@@ -267,6 +266,7 @@ class Player:
         self.score = 0
         self.tilebox = TileBox()
         self.pass_strike = 0
+        self.name = "Default"
 
     def refill_tilebox(self, new_tiles):
         i = 0
@@ -283,6 +283,12 @@ class Player:
             if field.state == FieldState.EMPTY:
                 count += 1
         return count
+    
+    def set_name(self, name):
+        self.name = name
+    
+    def get_name(self):
+        return self.name
 
 
 class AIPlayer(Player):
@@ -291,4 +297,4 @@ class AIPlayer(Player):
 
     def make_turn(self):
         import time
-        time.sleep(3)
+        time.sleep(5)
