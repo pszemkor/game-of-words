@@ -63,6 +63,12 @@ class Board(FieldsContainer):
     def get_field_from_coords(self, coords):
         return self.fields[coords[1]][coords[0]]
 
+    def fix_all(self):
+        for i in range(config.BOARD_SIZE):
+            for j in range(config.BOARD_SIZE):
+                if self.fields[i][j].state == FieldState.TEMPORARY:
+                    self.fields[i][j].state = FieldState.FIXED
+
 
 # TO DO -> CHECK WHETHER EVERYTHING IS IN PROGRAM MEMORY EVERY TIME (101 358 words is probably enough to play XD)
 class Dictionary:
@@ -178,6 +184,7 @@ class Game:
             # todo -> AI move
 
             self.set_active_player(self.players[self.index_of_next_player()])
+            self.board.fix_all()
             self.ev_manager.post(events.NextPlayerMoveStartedEvent(self))
 
         elif isinstance(event, events.NextPlayerMoveStartedEvent):
