@@ -8,6 +8,7 @@ import config
 import controller
 from validator import Validator
 from lexpy.dawg import DAWG
+from collections import Counter
 
 
 # todo -> algo do "AI"
@@ -84,6 +85,9 @@ class Dictionary:
         # print(self.possible_words)
         self.possible_words = DAWG().add_all(list(possible_words_set).sort())
         print(len(possible_words_set))
+
+    def prefix_exists(self, prefix):
+        return True if self.possible_words.search_with_prefix(prefix) is not [] else False
 
 
 class BagOfLetters:
@@ -359,6 +363,9 @@ class AIWord:
 class AIPlayer(Player):
     def __init__(self, game):
         super().__init__(game)
+        # cells at the edges have empty cross checks (thus config.BOARD_SIZE + 1, not only config.BOARD_SIZE)
+        self.cross_checks_board = [[{} for i in range(config.BOARD_SIZE + 1)] for j in range(config.BOARD_SIZE + 1)]
+        self.tilebox_list = None
 
     def make_turn(self):
         import time
@@ -368,6 +375,7 @@ class AIPlayer(Player):
 
         else:
             pass
+
     #         todo -> POST PASS
 
     def get_all_possible_words(self):
@@ -376,12 +384,34 @@ class AIPlayer(Player):
     def __get_anchors(self):
         pass
 
-    def __left_part(self, partial_word, limit):
-        self.__extend_right_part()
-        pass
+    def __left_part(self, partial_word, limit, anchor_coords, placement_type):
+        self.__extend_right_part(partial_word, anchor_coords, anchor_coords, placement_type)
+        if limit > 0:
+            for i, l in enumerate(self.tilebox_list()):
+                if self.game.dictionary.prefix_exists(partial_word + l):
+                    del self.tilebox_list[i]
+                    self.__left_part(partial_word + l, limit - 1, anchor_coords, placement_type)
+                    self.tilebox_list.insert(i, l)
 
-    def __extend_right_part(self):
+    def __extend_right_part(self, partial_word, field_coords, anchor_coords, placement_type):
+        if self.game.board.fields[field_coords].state == FieldState.EMPTY \
+                or (placement_type == PlacementType.HORIZONTAL and field_coords[1] == config.BOARD_SIZE) \
+                or (placement_type == PlacementType.VERTICAL and field_coords[0] == config.BOARD_SIZE):
+            if partial_word in self.game.dictionary.possible_words and field_coords is not anchor_coords:
+                self.legal_move(partial_word, field_coords, placement_type)
+            for i, e in enumerate(self.tilebox_list):
+                if e in self.cross_checks_board[field_coords]:
+                    del self.tilebox_list[i]
+                    next_field_coords = (
+                    field_coords[0], field_coords[1] + 1) if placement_type == PlacementType.HORIZONTAL else (
+                    field_coords[0] + 1, field_coords[1])
+                    self.__extend_right_part(partial_word + e, next_field_coords, anchor_coords, placement_type)
+                    self.tilebox_list.insert(i, e)
+
+    def legal_move(self, word, field_coords, placement_type):
         pass
 
     def place_tiles(self):
         pass
+
+    def tilebox_to_counter(self):
