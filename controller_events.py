@@ -122,6 +122,7 @@ class NextPlayerMoveStartedEvent(Event):
 
 
 class OtherPlayerTurnEvent(Event):
-    def __init__(self):
+    def __init__(self, player):
         super().__init__()
+        self.player = player
         self.name = "OtherPlayerTurnEvent"

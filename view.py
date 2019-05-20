@@ -61,6 +61,25 @@ class ButtonSprite(pygame.sprite.Sprite):
             self.__blit()
 
 
+class BannerSprite(pygame.sprite.Sprite):
+    def __init__(self, banner, group=None):
+        pygame.sprite.Sprite.__init__(self, group)
+        self.banner = banner
+        self.image = pygame.Surface(self.banner.shape)
+        self.update()
+
+    # DRY util
+    def __blit(self):
+        font = pygame.font.Font(None, self.banner.font_size)
+        text_img = font.render(self.banner.text, 1, (255, 255, 255))
+        text_rec = text_img.get_rect(center=(self.banner.shape[0] // 2, self.button.shape[1] // 2))
+        self.image.blit(text_img, text_rec)
+
+    def update(self):
+        self.image.fill(self.banner.bg_color)
+        self.__blit()
+
+
 class ButtonShapeType(Enum):
     RECTANGLE = 0
     CIRCLE = 1
@@ -73,6 +92,16 @@ class Button:
         self.font_size = font_size
         self.bg_color = bg_color
         self.shape = shape
+        self.left_edge_offset = left_edge_offset
+        self.top_edge_offset = top_edge_offset
+
+
+class Banner:
+    def __init__(self, text, font_size, bg_color, shape, left_edge_offset, top_edge_offset):
+        self.text = text
+        self.font_size = font_size
+        self.bg_color = bg_color
+        self.shape = shape  # (dimensions of rectangle)
         self.left_edge_offset = left_edge_offset
         self.top_edge_offset = top_edge_offset
 
@@ -151,8 +180,6 @@ class GameView:
         new_button_sprite = ButtonSprite(button, self.front_sprites)
         new_button_sprite.rect = button_rect
 
-        pass
-
     def show_buttons(self, buttons):
         for button in buttons:
             self.show_button(button)
@@ -170,6 +197,25 @@ class GameView:
         dirty_rects = dirty_rects1 + dirty_rects2
         pygame.display.update(dirty_rects)
 
+    def clean(self):
+        self.back_sprites = pygame.sprite.RenderUpdates()
+        self.front_sprites = pygame.sprite.RenderUpdates()
+        self.background.fill((0, 0, 0))
+        self.window.blit(self.background, (0, 0))
+        pygame.display.flip()
+
+    def show_other_player_move_banner(self, player):
+        self.background = pygame.Surface(self.window.get_size())
+        self.background.fill((40, 80, 120))
+        font = pygame.font.Font(None, 150)
+        text = "Brace yourself for\n" + player.get_name() + "\nmove!"
+        text_img = font.render(text, 1, (255, 255, 255))
+        text_rec = text_img.get_rect(center=(config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2))
+        self.background.blit(text_img, text_rec)
+        self.window.blit(self.background, (0, 0))
+        pygame.display.flip()
+
+
     def get_field_sprite(self, field):
         for sprite in self.back_sprites:
             if hasattr(sprite, "field") and sprite.field == field:
@@ -186,3 +232,6 @@ class GameView:
             self.get_field_sprite(event.field)
         elif isinstance(event, events.DrawGameButtonsEvent):
             self.show_buttons(event.buttons)
+        elif isinstance(event, events.OtherPlayerTurnEvent):
+            self.clean()
+            self.show_other_player_move_banner(event.player)
