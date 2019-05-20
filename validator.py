@@ -17,50 +17,50 @@ class Validator:
         if x != a and y != b:
             raise Exception("Tiles are not in one line!")
 
-    def __get_behind_temp_horizontal(self, board, y):
-        letters_behind = ""
+    def __get_before_temp_horizontal(self, board, y, x):
+        letters_before = ""
         score = 0
         for i in range(y - 1, -1, -1):
-            if board.fields[i][y].state == model.FieldState.EMPTY:
-                return (letters_behind, score)
-            else:
-                letters_behind += board.fields[i][y].tile.character
-            score += board.fields[i][y].tile.get_value()
-
-        return (letters_behind[::-1], score)
-
-    def __get_behind_temp_vertical(self, board, x):
-        letters_behind = ""
-        score = 0
-        for i in range(x - 1, -1, -1):
             if board.fields[x][i].state == model.FieldState.EMPTY:
-                return letters_behind, score
+                return (letters_before, score)
             else:
-                letters_behind += board.fields[x][i].tile.character
+                letters_before += board.fields[x][i].tile.character
             score += board.fields[x][i].tile.get_value()
 
-        return (letters_behind[::-1], score)
+        return (letters_before[::-1], score)
 
-    def __get_after_temp_horizontal(self, board, y):
-        letters_after = ""
+    def __get_before_temp_vertical(self, board, x, y):
+        letters_before = ""
         score = 0
-        for i in range(y, config.BOARD_SIZE, 1):
+        for i in range(x - 1, -1, -1):
             if board.fields[i][y].state == model.FieldState.EMPTY:
-                return letters_after, score
+                return letters_before, score
             else:
-                letters_after += board.fields[i][y].tile.character
+                letters_before += board.fields[i][y].tile.character
             score += board.fields[i][y].tile.get_value()
-        return (letters_after, score)
 
-    def __get_after_temp_vertical(self, board, x):
+        return (letters_before[::-1], score)
+
+    def __get_after_temp_horizontal(self, board, y, x):
         letters_after = ""
         score = 0
-        for i in range(x, config.BOARD_SIZE, 1):
+        for i in range(y + 1, config.BOARD_SIZE, 1):
             if board.fields[x][i].state == model.FieldState.EMPTY:
                 return letters_after, score
             else:
                 letters_after += board.fields[x][i].tile.character
             score += board.fields[x][i].tile.get_value()
+        return (letters_after, score)
+
+    def __get_after_temp_vertical(self, board, x, y):
+        letters_after = ""
+        score = 0
+        for i in range(x + 1, config.BOARD_SIZE, 1):
+            if board.fields[i][y].state == model.FieldState.EMPTY:
+                return letters_after, score
+            else:
+                letters_after += board.fields[i][y].tile.character
+            score += board.fields[i][y].tile.get_value()
         return (letters_after, score)
 
     # method return length of new word (just for a while)
@@ -92,36 +92,45 @@ class Validator:
         word_to_check = ""
         score = 0
         if vertical_sorted is None:
+            print("HORIZONTAL")
             x = horizontal_sorted[0][0]
 
-            (word_to_check_behind, score_behind) = self.__get_behind_temp_horizontal(board, horizontal_sorted[0][1])
+            (word_to_check_before, score_before) = self.__get_before_temp_horizontal(board, horizontal_sorted[0][1],
+                                                                                     horizontal_sorted[0][0])
+            print("before: ", word_to_check_before)
 
             for y in range(horizontal_sorted[0][1], horizontal_sorted[len(horizontal_sorted) - 1][1] + 1):
                 if board.fields[x][y].state == model.FieldState.EMPTY:
                     raise Exception("Tiles not in one word")
-                word_to_check_behind += board.fields[x][y].tile.character
-                score_behind += board.fields[x][y].tile.get_value() * \
+                word_to_check_before += board.fields[x][y].tile.character
+                score_before += board.fields[x][y].tile.get_value() * \
                                 (1 if board.fields[x][y].state == model.FieldState.FIXED else board.fields[x][y].bonus)
 
-            (word_to_check_after, score_after) = self.__get_after_temp_horizontal(board, horizontal_sorted[0][1])
-            word_to_check = word_to_check_behind + word_to_check_after
-            score = score_behind + score_after
+            (word_to_check_after, score_after) = self.__get_after_temp_horizontal(board, horizontal_sorted[::-1][0][1],
+                                                                                  horizontal_sorted[0][0])
+            print("before: ", word_to_check_before, "after: ", word_to_check_after)
+            word_to_check = word_to_check_before + word_to_check_after
+            score = score_before + score_after
 
         else:
+            print("VERTICAL")
             y = vertical_sorted[0][1]
 
-            (word_to_check_behind, score_behind) = self.__get_behind_temp_vertical(board, vertical_sorted[0][0])
-
+            (word_to_check_before, score_before) = self.__get_before_temp_vertical(board, vertical_sorted[0][0],
+                                                                                   vertical_sorted[0][1])
+            print("before: ", word_to_check_before)
             for x in range(vertical_sorted[0][0], vertical_sorted[len(vertical_sorted) - 1][0] + 1):
                 if board.fields[x][y].state == model.FieldState.EMPTY:
                     raise Exception("Tiles not in one word")
-                word_to_check_behind += board.fields[x][y].tile.character
-                score_behind += board.fields[x][y].tile.get_value() * \
+                word_to_check_before += board.fields[x][y].tile.character
+                score_before += board.fields[x][y].tile.get_value() * \
                                 (1 if board.fields[x][y].state == model.FieldState.FIXED else board.fields[x][y].bonus)
 
-            (word_to_check_after, score_after) = self.__get_after_temp_vertical(board, vertical_sorted[0][0])
-            word_to_check = word_to_check_behind + word_to_check_after
-            score = score_behind + score_after
+            (word_to_check_after, score_after) = self.__get_after_temp_vertical(board, vertical_sorted[::-1][0][0],
+                                                                                vertical_sorted[0][1])
+            print("before: ", word_to_check_before, "after: ", word_to_check_after)
+            word_to_check = word_to_check_before + word_to_check_after
+            score = score_before + score_after
 
         word_to_check.lower()
         print(word_to_check)
