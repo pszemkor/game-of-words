@@ -124,6 +124,7 @@ class Validator:
             score = score_behind + score_after
 
         word_to_check.lower()
+        print(word_to_check)
         if self.check_word(word_to_check.lower()):
             return score
         else:

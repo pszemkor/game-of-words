@@ -169,15 +169,18 @@ class Game:
                 print(str(e))
                 self.ev_manager.post(events.MoveRejectedEvent())
                 return
-            # ai move
-            self.ev_manager.post(events.AIPlayerMoveStartedEvent())
             # todo -> AI move
-            import time
-            time.sleep(3)
+            self.set_active_player(self.players[1])
+            self.ev_manager.post(events.AIPlayerMoveStartedEvent())
+            # self.players[1].move()
+
+            self.set_active_player(self.players[0])
+            # self.active_player.refill(self.bags_of_letters.get_new_letters(self.active_player.get_empty_fields_count()))
+
+            # todo -> refresh tilebox!!!
             self.ev_manager.post(events.AIPlayerMoveEndedEvent())
 
-            # getting letters from bag-of-letters:
-            # todo -> keep track of used letters ???
+
 
     def set_active_player(self, player):
         if player in self.players:
@@ -265,10 +268,27 @@ class Player:
         self.tilebox = TileBox()
         self.pass_strike = 0
 
+    def refill_tilebox(self, new_tiles):
+        i = 0
+        for field in self.tilebox.fields:
+            if field.state == FieldState.EMPTY:
+                if len(new_tiles) - i <= 0:
+                    return
+                field.tile = new_tiles[i]
+                i += 1
+
+    def get_empty_fields_count(self):
+        count = 0
+        for field in self.tilebox.fields:
+            if field.state == FieldState.EMPTY:
+                count += 1
+        return count
+
 
 class AIPlayer(Player):
     def __init__(self):
         super().__init__()
 
     def make_turn(self):
-        pass
+        import time
+        time.sleep(3)
