@@ -7,6 +7,7 @@ from enum import Enum
 import config
 import controller
 from validator import Validator
+from lexpy.dawg import DAWG
 
 
 # todo -> algo do "AI"
@@ -73,15 +74,16 @@ class Board(FieldsContainer):
 # TO DO -> CHECK WHETHER EVERYTHING IS IN PROGRAM MEMORY EVERY TIME (101 358 words is probably enough to play XD)
 class Dictionary:
     def __init__(self):
-        self.possible_words = set()
+        possible_words_set = set()
         for c in string.ascii_uppercase:
             file = "words/" + c + "word.csv"
             with open(file, 'r', encoding='ISO-8859-1', newline='') as csvFile:
                 reader = csv.reader(csvFile)
                 for row in reader:
-                    self.possible_words.add(row[0].strip())
+                    possible_words_set.add(row[0].strip())
         # print(self.possible_words)
-        print(len(self.possible_words))
+        self.possible_words = DAWG().add_all(list(possible_words_set).sort())
+        print(len(possible_words_set))
 
 
 class BagOfLetters:
@@ -325,7 +327,6 @@ class Player:
                 self.tilebox.fields[i].state = FieldState.TEMPORARY
                 j += 1
 
-
     def get_empty_fields_count(self):
         count = 0
         for field in self.tilebox.fields:
@@ -343,6 +344,18 @@ class Player:
         pass
 
 
+class PlacementType(Enum):
+    HORIZONTAL = 0
+    VERTICAL = 1
+
+
+class AIWord:
+    def __init__(self, word, score, placement_type):
+        self.word = word
+        self.score = score
+        self.placement_type = placement_type
+
+
 class AIPlayer(Player):
     def __init__(self, game):
         super().__init__(game)
@@ -350,3 +363,25 @@ class AIPlayer(Player):
     def make_turn(self):
         import time
         time.sleep(5)
+        all_possible_words = self.get_all_possible_words()
+        if all_possible_words is not []:
+
+        else:
+            pass
+    #         todo -> POST PASS
+
+    def get_all_possible_words(self):
+        pass
+
+    def __get_anchors(self):
+        pass
+
+    def __left_part(self, partial_word, limit):
+        self.__extend_right_part()
+        pass
+
+    def __extend_right_part(self):
+        pass
+
+    def place_tiles(self):
+        pass

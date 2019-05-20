@@ -1,15 +1,17 @@
+from lexpy.dawg import DAWG
+
 import model
 import config
 
 
 class Validator:
 
-    def __init__(self, ev_manager, dictionary):
+    def __init__(self, ev_manager, dawg):
         self.event_manager = ev_manager
-        self.dictionary = dictionary
+        self.dawg = dawg
 
     def check_word(self, word):
-        return True if word in self.dictionary else False
+        return True if self.dawg.search(word) is not None else False
 
     def check_if_one_line(self, first_coords, current_coords):
         (x, y) = first_coords
