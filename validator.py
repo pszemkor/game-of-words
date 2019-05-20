@@ -83,8 +83,8 @@ class Validator:
 
         if len(temps) == 0:
             raise Exception("None tile has been put!")
-        if len(temps) == 1:
-            raise Exception("There is no one-letter word!")
+        # if len(temps) == 1:
+        #     raise Exception("There is no one-letter word!")
 
         horizontal_sorted = sorted(temps, key=lambda x: x[1])
         vertical_sorted = None
