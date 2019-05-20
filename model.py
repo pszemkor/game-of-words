@@ -152,7 +152,8 @@ class Game:
                     self.board.set_active_field(None)
                 # todo VALIDATION - tiles have just been swapped!!
             else:
-                self.board.set_active_field(field)
+                if field.state is not FieldState.FIXED:
+                    self.board.set_active_field(field)
             ev = events.UpdateFieldEvent(field)
             self.ev_manager.post(ev)
         # handle tilebox active field selection
@@ -168,7 +169,8 @@ class Game:
                     self.board.set_active_field(None)
                 # todo VALIDATION - tiles have just been swapped!!
             else:
-                self.active_player.tilebox.set_active_field(field)
+                if field.state is not FieldState.FIXED:
+                    self.active_player.tilebox.set_active_field(field)
             ev = events.UpdateFieldEvent(field)
             self.ev_manager.post(ev)
         elif isinstance(event, events.ConfirmButtonPressedEvent):
