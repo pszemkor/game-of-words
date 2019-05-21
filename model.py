@@ -157,7 +157,7 @@ class Game:
             if field.is_active:
                 self.board.set_active_field(None)
                 # tilebox has active field -> will swap tiles
-                if self.active_player.tilebox.active_field is not None:
+                if self.active_player.tilebox.active_field is not None and self.active_player.tilebox.active_field is not FieldState.FIXED:
                     self.active_player.tilebox.active_field.tile, field.tile = field.tile, self.active_player.tilebox.active_field.tile
                     self.active_player.tilebox.active_field.state, field.state = field.state, self.active_player.tilebox.active_field.state
                     self.active_player.tilebox.set_active_field(None)
@@ -174,7 +174,7 @@ class Game:
             if field.is_active:
                 self.active_player.tilebox.set_active_field(None)
                 # tilebox has active field -> will swap tiles
-                if self.board.active_field is not None:
+                if self.board.active_field is not None and self.board.active_field.state is not FieldState.FIXED:
                     self.board.active_field.tile, field.tile = field.tile, self.board.active_field.tile
                     self.board.active_field.state, field.state = field.state, self.board.active_field.state
                     self.active_player.tilebox.set_active_field(None)
@@ -398,7 +398,7 @@ class AIPlayer(Player):
         self.__get_tilebox_list()
         self.get_all_possible_words()
         all_possible_words = self.all_possible_words_dict.items()
-        print("Found such possible words", all_possible_words)
+        # print("Found such possible words", all_possible_words)
         print("Tilebox of AI player", self.tilebox_list)
         if all_possible_words is not []:
             for el in all_possible_words:
@@ -431,24 +431,24 @@ class AIPlayer(Player):
         self.all_possible_words_dict = {}
         anchors = self.__get_anchors()
 
-        print("Anchors horizontal are: ", anchors)
+        # print("Anchors horizontal are: ", anchors)
         self.__init_crosschecks(anchors, PlacementType.HORIZONTAL)
         print(self.cross_checks_board)
         for field_coords in anchors:
             # handle horizontal words cases
             limit = self.__get_limit_of_left_part(field_coords, anchors, PlacementType.HORIZONTAL)
             beginning = self.__get_beginning_of_left_part(field_coords, anchors, PlacementType.HORIZONTAL)
-            print("H - For anchor", field_coords, "limit is", limit, "prefix:", beginning)
+            # print("H - For anchor", field_coords, "limit is", limit, "prefix:", beginning)
             self.__left_part(beginning, limit, field_coords, PlacementType.HORIZONTAL)
 
-        print("Anchors vertical are: ", anchors)
+        # print("Anchors vertical are: ", anchors)
         self.__init_crosschecks(anchors, PlacementType.VERTICAL)
         print(self.cross_checks_board)
         for field_coords in anchors:
             # handle vertical words cases
             limit = self.__get_limit_of_left_part(field_coords, anchors, PlacementType.VERTICAL)
             beginning = self.__get_beginning_of_left_part(field_coords, anchors, PlacementType.VERTICAL)
-            print("V - For anchor", field_coords, "limit is", limit, "prefix:", beginning)
+            # print("V - For anchor", field_coords, "limit is", limit, "prefix:", beginning)
             self.__left_part(beginning, limit, field_coords, PlacementType.VERTICAL)
         pass
 
@@ -462,7 +462,7 @@ class AIPlayer(Player):
                 beginning = self.game.board.fields[current_coords[0]][current_coords[1]].tile.character + beginning
                 current_coords = (current_coords[0] - 1, current_coords[1])
             else:
-                print('V - begging is', beginning, 'field coords', field_coords)
+                # print('V - begging is', beginning, 'field coords', field_coords)
                 return beginning
         else:
             current_coords = (current_coords[0], current_coords[1] - 1)
@@ -471,7 +471,7 @@ class AIPlayer(Player):
                 beginning = self.game.board.fields[current_coords[0]][current_coords[1]].tile.character + beginning
                 current_coords = (current_coords[0], current_coords[1] - 1)
             else:
-                print('H - begging is', beginning, 'field coords', field_coords)
+                # print('H - begging is', beginning, 'field coords', field_coords)
                 return beginning
 
     def __can_be_anchor(self, coords):
@@ -503,14 +503,14 @@ class AIPlayer(Player):
                 # print('will now check partial word', partial_word + l)
                 if l != '?':
                     if self.game.dictionary.prefix_exists(partial_word + l):
-                        print('checking word in  partial word left part', partial_word + l, placement_type)
+                        # print('checking word in  partial word left part', partial_word + l, placement_type)
                         del self.tilebox_list[i]
                         self.__left_part(partial_word + l, limit - 1, anchor_coords, placement_type)
                         self.tilebox_list.insert(i, l)
                 else:
                     for l_wild in string.ascii_lowercase:
                         if self.game.dictionary.prefix_exists(partial_word + l_wild):
-                            print('checking word in  partial word left part', partial_word + l_wild, placement_type)
+                            # print('checking word in  partial word left part', partial_word + l_wild, placement_type)
                             del self.tilebox_list[i]
                             self.__left_part(partial_word + l_wild, limit - 1, anchor_coords, placement_type)
                             self.tilebox_list.insert(i, l)
@@ -520,7 +520,7 @@ class AIPlayer(Player):
                 or placement_type == PlacementType.VERTICAL and field_coords[0] == config.BOARD_SIZE \
                 or self.game.board.fields[field_coords[0]][field_coords[1]].state == FieldState.EMPTY:
 
-            print('will check partial word in right part', partial_word, field_coords)
+            # print('will check partial word in right part', partial_word, field_coords)
             if partial_word in self.game.dictionary.possible_words and field_coords is not anchor_coords:
                 self.legal_move(partial_word, field_coords, placement_type, anchor_coords)
             for i, e in enumerate(self.tilebox_list):
@@ -587,8 +587,8 @@ class AIPlayer(Player):
                             if len(word) == 1:
                                 self.cross_checks_board[i][anchor_column].add(l)
                             elif word in self.game.dictionary.possible_words:
-                                if len(word) > 1:
-                                    print('V - expanded', [i, anchor_column], 'letter', l, 'word', word)
+                                # if len(word) > 1:
+                                    # print('V - expanded', [i, anchor_column], 'letter', l, 'word', word)
                                 self.cross_checks_board[i][anchor_column].add(l)
         else:
             anchor_rows = set()
@@ -603,8 +603,8 @@ class AIPlayer(Player):
                             if len(word) == 1:
                                 self.cross_checks_board[anchor_row][i].add(l)
                             elif word in self.game.dictionary.possible_words:
-                                if len(word) > 1:
-                                    print('H - expanded', [anchor_row, i], 'letter', l, 'word', word)
+                                # if len(word) > 1:
+                                    # print('H - expanded', [anchor_row, i], 'letter', l, 'word', word)
                                 self.cross_checks_board[anchor_row][i].add(l)
 
     def __get_whole_word_expansion(self, field_coords, letter, placement_type):

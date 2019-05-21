@@ -26,7 +26,7 @@ class Validator:
             if board.fields[x][i].state == model.FieldState.EMPTY:
                 return (letters_before, score)
             else:
-                letters_before += board.fields[x][i].tile.character
+                letters_before = board.fields[x][i].tile.character + letters_before
             score += board.fields[x][i].tile.get_value()
 
         return (letters_before[::-1], score)
@@ -38,7 +38,7 @@ class Validator:
             if board.fields[i][y].state == model.FieldState.EMPTY:
                 return letters_before, score
             else:
-                letters_before += board.fields[i][y].tile.character
+                letters_before = board.fields[i][y].tile.character + letters_before
             score += board.fields[i][y].tile.get_value()
 
         return (letters_before[::-1], score)
