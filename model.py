@@ -82,6 +82,7 @@ class Dictionary:
                 reader = csv.reader(csvFile)
                 print("Read file", file)
                 for row in reader:
+                    word = ''.join(x for x in row[0] if x.isalpha())
                     possible_words_set.add(''.join(x for x in row[0] if x.isalpha()))
         # print(self.possible_words)
         # print(sorted(list(possible_words_set)))
@@ -90,7 +91,7 @@ class Dictionary:
         print(len(possible_words_set))
 
     def prefix_exists(self, prefix):
-        return True if self.possible_words.search_with_prefix(prefix) is not [] else False
+        return True if self.possible_words.search_with_prefix(prefix) is not None else False
 
 
 class BagOfLetters:
@@ -188,6 +189,7 @@ class Game:
             try:
                 self.active_player.score += self.validator.verify_board(self.board)
                 print(self.active_player.score)
+                self.board.fix_all()
             except Exception as e:
                 print(str(e))
                 self.ev_manager.post(events.MoveRejectedEvent())
@@ -195,7 +197,6 @@ class Game:
             # todo -> AI move
 
             self.set_active_player(self.players[self.index_of_next_player()])
-            self.board.fix_all()
             self.ev_manager.post(events.NextPlayerMoveStartedEvent(self))
 
         elif isinstance(event, events.NextPlayerMoveStartedEvent):
@@ -368,7 +369,7 @@ class AIPlayer(Player):
     def __init__(self, game):
         super().__init__(game)
         # cells at the edges have empty cross checks (thus config.BOARD_SIZE + 1, not only config.BOARD_SIZE)
-        self.cross_checks_board = [[{} for i in range(config.BOARD_SIZE + 1)] for j in range(config.BOARD_SIZE + 1)]
+        self.cross_checks_board = [[set() for i in range(config.BOARD_SIZE + 1)] for j in range(config.BOARD_SIZE + 1)]
         self.tilebox_list = None
         # position : (word, type[horizontal, vertical])
         self.all_possible_words_dict = {}
@@ -376,12 +377,12 @@ class AIPlayer(Player):
     def make_turn(self):
         self.__get_tilebox_list()
         self.get_all_possible_words()
-        all_possible_words = list(self.all_possible_words_dict)
+        all_possible_words = self.all_possible_words_dict.items()
         print("Found such possible words", all_possible_words)
-        print("Tilebox of AI player" ,self.tilebox_list)
+        print("Tilebox of AI player", self.tilebox_list)
         if all_possible_words is not []:
             for el in all_possible_words:
-                print('ai found',el)
+                print('ai found', el)
         else:
             pass
 
@@ -391,32 +392,42 @@ class AIPlayer(Player):
         current_position = field_position
         limit = 0
         if placement_type is PlacementType.VERTICAL:
-            while current_position[0] > 0 and current_position not in anchors and self.game.board.fields[
-                    current_position].state == FieldState.EMPTY:
-                current_position[0] -= 1
+            current_position = [current_position[0] - 1, current_position[1]]
+            while current_position[0] >= 0 and current_position not in anchors and self.game.board.fields[
+                current_position[0]][current_position[1]].state == FieldState.EMPTY:
+                current_position = [current_position[0] - 1, current_position[1]]
                 limit += 1
             else:
                 return limit
         else:
-            while current_position[1] > 0 and current_position not in anchors and self.game.board.fields[
-                    current_position].state == FieldState.EMPTY:
-                current_position[1] -= 1
+            current_position = [current_position[0], current_position[1] - 1]
+            while current_position[1] >= 0 and current_position not in anchors and self.game.board.fields[
+                current_position[0]][current_position[1]].state == FieldState.EMPTY:
+                current_position = [current_position[0], current_position[1] - 1]
                 limit += 1
             else:
                 return limit
 
     def get_all_possible_words(self):
         self.all_possible_words_dict = {}
-        anchors = self.__get_anchors()
-        print("Anchors are: ", anchors)
-        for field_coords in anchors:
+        anchors_horizontal = self.__get_anchors(PlacementType.HORIZONTAL)
+        print("Anchors horizontal are: ", anchors_horizontal)
+        for field_coords in anchors_horizontal:
             # handle horizontal words cases
-            limit = self.__get_limit_of_left_part(field_coords, anchors, PlacementType.HORIZONTAL)
-            beginning = self.__get_beginning_of_left_part(field_coords, anchors, PlacementType.HORIZONTAL)
+            self.__init_crosschecks(field_coords, PlacementType.HORIZONTAL)
+            limit = self.__get_limit_of_left_part(field_coords, anchors_horizontal, PlacementType.HORIZONTAL)
+            beginning = self.__get_beginning_of_left_part(field_coords, anchors_horizontal, PlacementType.HORIZONTAL)
+            print("H - For anchor", field_coords, "limit is", limit, "prefix:", beginning)
             self.__left_part(beginning, limit, field_coords, PlacementType.HORIZONTAL)
+
+        anchors_vertical = self.__get_anchors(PlacementType.VERTICAL)
+        print("Anchors vertical are: ", anchors_vertical)
+        for field_coords in anchors_vertical:
             # handle vertical words cases
-            limit = self.__get_limit_of_left_part(field_coords, anchors, PlacementType.VERTICAL)
-            beginning = self.__get_beginning_of_left_part(field_coords, anchors, PlacementType.VERTICAL)
+            self.__init_crosschecks(field_coords, PlacementType.VERTICAL)
+            limit = self.__get_limit_of_left_part(field_coords, anchors_vertical, PlacementType.VERTICAL)
+            beginning = self.__get_beginning_of_left_part(field_coords, anchors_vertical, PlacementType.VERTICAL)
+            print("V - For anchor", field_coords, "limit is", limit, "prefix:", beginning)
             self.__left_part(beginning, limit, field_coords, PlacementType.VERTICAL)
         pass
 
@@ -424,21 +435,25 @@ class AIPlayer(Player):
         beginning = ''
         current_coords = field_coords
         if placement_type is PlacementType.VERTICAL:
+            current_coords = [current_coords[0] - 1, current_coords[1]]
             while current_coords[0] > 0 and current_coords not in anchors and self.game.board.fields[
-                current_coords].state == FieldState.FIXED:
-                beginning += self.game.board.fields[current_coords].tile.character
-                current_coords[0] -= 1
+                current_coords[0]][current_coords[1]].state == FieldState.FIXED:
+                beginning += self.game.board.fields[current_coords[0]][current_coords[1]].tile.character
+                current_coords = [current_coords[0] - 1, current_coords[1]]
             else:
+                print('V - begging is', beginning, 'coords', current_coords)
                 return beginning
         else:
+            current_coords = [current_coords[0], current_coords[1] - 1]
             while current_coords[1] > 0 and current_coords not in anchors and self.game.board.fields[
-                current_coords].state == FieldState.FIXED:
-                beginning += self.game.board.fields[current_coords].tile.character
-                current_coords[1] -= 1
+                current_coords[0]][current_coords[1]].state == FieldState.FIXED:
+                beginning = self.game.board.fields[current_coords[0]][current_coords[1]].tile.character + beginning
+                current_coords = [current_coords[0], current_coords[1] - 1]
             else:
+                print('H - begging is', beginning, 'coords', current_coords)
                 return beginning
 
-    def __can_be_anchor(self, coords):
+    def __can_be_anchor(self, coords, placement_type):
         (x, y) = coords
         if self.game.board.fields[x][y].state == FieldState.FIXED:
             return False
@@ -450,43 +465,55 @@ class AIPlayer(Player):
             if config.BOARD_SIZE > x_neigh >= 0 and config.BOARD_SIZE > y_neigh >= 0 and \
                     self.game.board.fields[x_neigh][y_neigh].state == FieldState.FIXED:
                 return True
-            else:
-                return False
+        return False
 
-    def __get_anchors(self):
+    def __get_anchors(self, placement_type):
         anchors = []
         for i in range(config.BOARD_SIZE):
             for j in range(config.BOARD_SIZE):
-                if self.__can_be_anchor((i, j)):
+                if self.__can_be_anchor((i, j), placement_type):
                     anchors.append((i, j))
         return anchors
 
     def __left_part(self, partial_word, limit, anchor_coords, placement_type):
         self.__extend_right_part(partial_word, anchor_coords, anchor_coords, placement_type)
         if limit > 0:
-            for i, l in enumerate(self.tilebox_list()):
-                if self.game.dictionary.prefix_exists(partial_word + l):
+            for i, l in enumerate(self.tilebox_list):
+                # todo -> add wildcard matching
+                if l != '?' and self.game.dictionary.prefix_exists(partial_word + l):
                     del self.tilebox_list[i]
                     self.__left_part(partial_word + l, limit - 1, anchor_coords, placement_type)
                     self.tilebox_list.insert(i, l)
 
     def __extend_right_part(self, partial_word, field_coords, anchor_coords, placement_type):
-        if self.game.board.fields[field_coords[0]][field_coords[1]].state == FieldState.EMPTY \
-                or (placement_type == PlacementType.HORIZONTAL and field_coords[1] == config.BOARD_SIZE) \
-                or (placement_type == PlacementType.VERTICAL and field_coords[0] == config.BOARD_SIZE):
+        if placement_type == PlacementType.HORIZONTAL and field_coords[1] == config.BOARD_SIZE \
+                or placement_type == PlacementType.VERTICAL and field_coords[0] == config.BOARD_SIZE \
+                or self.game.board.fields[field_coords[0]][field_coords[1]].state == FieldState.EMPTY:
+
             if partial_word in self.game.dictionary.possible_words and field_coords is not anchor_coords:
-                self.legal_move(partial_word, field_coords, placement_type)
+                self.legal_move(partial_word, field_coords, placement_type, anchor_coords)
             for i, e in enumerate(self.tilebox_list):
-                if e in self.cross_checks_board[field_coords[0]][field_coords[1]]:
+                # todo -> add wildcard matching
+                if e != '?' and e in self.cross_checks_board[field_coords[0]][field_coords[1]]:
                     del self.tilebox_list[i]
                     next_field_coords = (
                         field_coords[0], field_coords[1] + 1) if placement_type == PlacementType.HORIZONTAL else (
                         field_coords[0] + 1, field_coords[1])
-                    self.__extend_right_part(partial_word + e, next_field_coords, anchor_coords, placement_type)
+                    if self.game.dictionary.prefix_exists(partial_word + e):
+                        # print('prefix exists', partial_word + e)
+                        self.__extend_right_part(partial_word + e, next_field_coords, anchor_coords, placement_type)
                     self.tilebox_list.insert(i, e)
+        else:
+            e = self.game.board.fields[field_coords[0]][field_coords[1]].tile.character
+            next_field_coords = (
+                field_coords[0], field_coords[1] + 1) if placement_type == PlacementType.HORIZONTAL else (
+                field_coords[0] + 1, field_coords[1])
+            if self.game.dictionary.prefix_exists(partial_word + e):
+                self.__extend_right_part(partial_word + e, next_field_coords, anchor_coords, placement_type)
 
-    def legal_move(self, word, field_coords, placement_type):
-        self.all_possible_words_dict[field_coords[0]][field_coords[1]] = (word, placement_type)
+    #
+    def legal_move(self, word, field_coords, placement_type, anchor_coords):
+        self.all_possible_words_dict[field_coords] = (word, placement_type, anchor_coords)
 
     def place_tiles(self, ai_word):
         self.score += ai_word.score
@@ -499,3 +526,61 @@ class AIPlayer(Player):
         for field in self.tilebox.fields:
             if field.state is not FieldState.EMPTY:
                 self.tilebox_list.append(field.tile.character)
+
+    def __init_crosschecks(self, anchor, placement_type):
+        if placement_type is PlacementType.VERTICAL:
+            self.cross_checks_board = [[set() for i in range(config.BOARD_SIZE + 1)] for j in
+                                       range(config.BOARD_SIZE + 1)]
+            for i in range(config.BOARD_SIZE):
+                for l in string.ascii_lowercase:
+                    word = self.__get_whole_word_expansion([i, anchor[1]], l, PlacementType.VERTICAL)
+                    if word in self.game.dictionary.possible_words:
+                        if len(word) > 1:
+                            print('V - expanded', [i, anchor[1]], 'letter', l, 'word', word)
+                        self.cross_checks_board[i][anchor[1]].add(l)
+        else:
+            self.cross_checks_board = [[set() for i in range(config.BOARD_SIZE + 1)] for j in
+                                       range(config.BOARD_SIZE + 1)]
+            for i in range(config.BOARD_SIZE):
+                for l in string.ascii_lowercase:
+                    word = self.__get_whole_word_expansion([anchor[0], i], l, PlacementType.HORIZONTAL)
+                    if word in self.game.dictionary.possible_words:
+                        if len(word) > 1:
+                            print('H - expanded', [anchor[0], i], 'letter', l, 'word', word)
+                        self.cross_checks_board[anchor[0]][i].add(l)
+
+    def __get_whole_word_expansion(self, field_coords, letter, placement_type):
+        word_expansion = letter
+        current_coords = field_coords.copy()
+        if placement_type is PlacementType.VERTICAL:
+            current_coords[1] -= 1
+            while current_coords[1] >= 0 and self.game.board.fields[current_coords[0]][
+                current_coords[1]].state is FieldState.FIXED:
+                word_expansion = self.game.board.fields[current_coords[0]][
+                                     current_coords[1]].tile.character + word_expansion
+                current_coords[1] -= 1
+
+            current_coords = field_coords.copy()
+            current_coords[1] += 1
+            while current_coords[1] < config.BOARD_SIZE and self.game.board.fields[current_coords[0]][
+                current_coords[1]].state is FieldState.FIXED:
+                word_expansion += self.game.board.fields[current_coords[0]][
+                    current_coords[1]].tile.character
+                current_coords[1] += 1
+            return word_expansion
+        else:
+            current_coords[0] -= 1
+            while current_coords[0] >= 0 and self.game.board.fields[current_coords[0]][
+                current_coords[1]].state is FieldState.FIXED:
+                word_expansion = self.game.board.fields[current_coords[0]][
+                                     current_coords[1]].tile.character + word_expansion
+                current_coords[0] -= 1
+
+            current_coords = field_coords.copy()
+            current_coords[0] += 1
+            while current_coords[0] < config.BOARD_SIZE and self.game.board.fields[current_coords[0]][
+                current_coords[1]].state is FieldState.FIXED:
+                word_expansion += self.game.board.fields[current_coords[0]][
+                    current_coords[1]].tile.character
+                current_coords[0] += 1
+            return word_expansion
