@@ -9,6 +9,7 @@ import controller
 from validator import Validator
 from lexpy.dawg import DAWG
 from collections import Counter
+import itertools
 
 
 # todo -> algo do "AI"
@@ -200,9 +201,14 @@ class Game:
             self.ev_manager.post(events.NextPlayerMoveStartedEvent(self))
 
 
-        #todo -> handle buttons
+        # todo -> handle buttons
         elif isinstance(event, events.ShuffleButtonPressedEvent):
-            pass
+            tilebox = self.active_player.tilebox.fields
+            import random
+            permutations = list(itertools.permutations(tilebox))
+            rand_permutation_index = random.randint(0, len(permutations) - 1)
+            self.active_player.tilebox.fields = permutations[rand_permutation_index]
+            self.ev_manager.post(events.TileBoxBuildEvent(self.active_player.tilebox))
         elif isinstance(event, events.SurrenderButtonPressedEvent):
             pass
         elif isinstance(event, events.FactButtonPressedEvent):
