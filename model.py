@@ -199,6 +199,19 @@ class Game:
             self.set_active_player(self.players[self.index_of_next_player()])
             self.ev_manager.post(events.NextPlayerMoveStartedEvent(self))
 
+
+        #todo -> handle buttons
+        elif isinstance(event, events.ShuffleButtonPressedEvent):
+            pass
+        elif isinstance(event, events.SurrenderButtonPressedEvent):
+            pass
+        elif isinstance(event, events.FactButtonPressedEvent):
+            pass
+        elif isinstance(event, events.PassButtonPressedEvent):
+            pass
+
+
+
         elif isinstance(event, events.NextPlayerMoveStartedEvent):
             self.board = event.game.board
             self.players = event.game.players
