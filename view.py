@@ -129,7 +129,7 @@ class GameView:
         self.front_sprites = pygame.sprite.RenderUpdates()
 
         # pygame.time.delay(2000)
-        pygame.time.delay(200)
+        # pygame.time.delay(200)
 
     def show_board(self, board):
         self.background.fill((0, 0, 0))
