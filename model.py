@@ -10,8 +10,8 @@ from validator import Validator
 # from lexpy.dawg import DAWG
 # from lexpy.trie import Trie
 from collections import Counter
+import itertools
 import dawg
-
 
 # todo -> algo do "AI"
 # todo ->
@@ -200,6 +200,24 @@ class Game:
 
             self.set_active_player(self.players[self.index_of_next_player()])
             self.ev_manager.post(events.NextPlayerMoveStartedEvent(self))
+
+
+        # todo -> handle buttons
+        elif isinstance(event, events.ShuffleButtonPressedEvent):
+            tilebox = self.active_player.tilebox.fields
+            import random
+            permutations = list(itertools.permutations(tilebox))
+            rand_permutation_index = random.randint(0, len(permutations) - 1)
+            self.active_player.tilebox.fields = permutations[rand_permutation_index]
+            self.ev_manager.post(events.TileBoxBuildEvent(self.active_player.tilebox))
+        elif isinstance(event, events.SurrenderButtonPressedEvent):
+            pass
+        elif isinstance(event, events.FactButtonPressedEvent):
+            pass
+        elif isinstance(event, events.PassButtonPressedEvent):
+            pass
+
+
 
         elif isinstance(event, events.NextPlayerMoveStartedEvent):
             self.board = event.game.board

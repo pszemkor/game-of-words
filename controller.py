@@ -86,6 +86,18 @@ class MouseEventHandler:
             elif hasattr(sprite, 'button') and sprite.button.text == 'Confirm':
                 ev_to_send = events.ConfirmButtonPressedEvent()
                 return ev_to_send
+            elif hasattr(sprite, 'button') and sprite.button.text == 'Pass':
+                ev_to_send = events.PassButtonPressedEvent()
+                return ev_to_send
+            elif hasattr(sprite, 'button') and sprite.button.text == 'Shuffle':
+                ev_to_send = events.ShuffleButtonPressedEvent()
+                return ev_to_send
+            elif hasattr(sprite, 'button') and sprite.button.text == 'Fact':
+                ev_to_send = events.FactButtonPressedEvent()
+                return ev_to_send
+            elif hasattr(sprite, 'button') and sprite.button.text == 'Surrender':
+                ev_to_send = events.SurrenderButtonPressedEvent()
+                return ev_to_send
 
 
 class MouseController:

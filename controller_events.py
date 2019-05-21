@@ -68,9 +68,18 @@ class DrawGameButtonsEvent(ButtonEvent):
     def __init__(self):
         super().__init__()
         self.name = 'DrawGameButtonsEvent'
-        confirm_button = view.Button(view.ButtonShapeType.CIRCLE, 'Confirm', 20, (240, 0, 240), (50, 50), 800, 625)
+        confirm_button = view.Button(view.ButtonShapeType.CIRCLE, 'Confirm', 20, (51, 255, 53), (60, 60), 830, 625)
+        shuffle_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Shuffle', 20, (51, 255, 53), (50, 50), 110, 480)
+        pass_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Pass', 20, (51, 255, 53), (50, 50), 110, 550)
+        surrender_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Surrender', 15, (51, 255, 53), (50, 50), 110,
+                                       410)
+        random_fact_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Fact', 20, (51, 255, 53), (50, 50), 110, 340)
         self.buttons = []
         self.buttons.append(confirm_button)
+        self.buttons.append(shuffle_button)
+        self.buttons.append(pass_button)
+        self.buttons.append(surrender_button)
+        self.buttons.append(random_fact_button)
 
 
 class ConfirmButtonEvent(ButtonEvent):
@@ -92,6 +101,30 @@ class ConfirmButtonPressedEvent(Event):
     def __init__(self):
         super().__init__()
         self.name = "ConfirmButtonPressedEvent"
+
+
+class FactButtonPressedEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "FactButtonPressedEvent"
+
+
+class ShuffleButtonPressedEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "ShuffleButtonPressedEvent"
+
+
+class PassButtonPressedEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "PassButtonPressedEvent"
+
+
+class SurrenderButtonPressedEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "SurrenderButtonPressedEvent"
 
 
 class UpdateFieldEvent(Event):
