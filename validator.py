@@ -1,4 +1,4 @@
-from lexpy.dawg import DAWG
+# from lexpy.dawg import DAWG
 
 import model
 import config
@@ -11,7 +11,7 @@ class Validator:
         self.dawg = dawg
 
     def check_word(self, word):
-        return True if self.dawg.search(word) is not None else False
+        return word in self.dawg
 
     def check_if_one_line(self, first_coords, current_coords):
         (x, y) = first_coords
