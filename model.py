@@ -13,6 +13,7 @@ from collections import Counter
 import itertools
 import dawg
 
+
 # todo -> algo do "AI"
 # todo ->
 
@@ -74,7 +75,6 @@ class Board(FieldsContainer):
                     self.fields[i][j].state = FieldState.FIXED
 
 
-# TO DO -> CHECK WHETHER EVERYTHING IS IN PROGRAM MEMORY EVERY TIME (101 358 words is probably enough to play XD)
 class Dictionary:
     def __init__(self):
         possible_words_set = set()
@@ -204,12 +204,26 @@ class Game:
 
         # todo -> handle buttons
         elif isinstance(event, events.ShuffleButtonPressedEvent):
-            tilebox = self.active_player.tilebox.fields
+            fields = self.active_player.tilebox.fields
+            tiles = []
+            for field in fields:
+                if field.state == FieldState.TEMPORARY:
+                    tiles.append(field.tile)
+
             import random
-            permutations = list(itertools.permutations(tilebox))
+            permutations = list(itertools.permutations(tiles))
             rand_permutation_index = random.randint(0, len(permutations) - 1)
-            self.active_player.tilebox.fields = permutations[rand_permutation_index]
+            tiles = permutations[rand_permutation_index]
+            i = 0
+            for field in self.active_player.tilebox.fields:
+                if field.state != FieldState.TEMPORARY:
+                    continue
+                print(tiles[i])
+                field.tile = tiles[i]
+                i += 1
+
             self.ev_manager.post(events.TileBoxBuildEvent(self.active_player.tilebox))
+
         elif isinstance(event, events.SurrenderButtonPressedEvent):
             pass
         elif isinstance(event, events.FactButtonPressedEvent):
@@ -393,19 +407,51 @@ class AIPlayer(Player):
         self.tilebox_list = None
         # position : (word, type[horizontal, vertical])
         self.all_possible_words_dict = {}
+        self.score = 0
+
+    def remove_tile(self, word, x, y, index):
+        # if self.game.board.fields[x][y].state == FieldState.EMPTY:
+        #     for field in self.tilebox.fields:
+        #         if field.tile.character == word[index]:
+        #             self.score += field.tile.get_value()
+        #             field.state = FieldState.EMPTY
+        #             field.tile = None
+        pass
 
     def make_turn(self):
         self.__get_tilebox_list()
         self.get_all_possible_words()
         all_possible_words = self.all_possible_words_dict.items()
         # print("Found such possible words", all_possible_words)
-        print("Tilebox of AI player", self.tilebox_list)
+        print("Tilebox of AI player", self.tilebox.fields)
+
         if all_possible_words is not []:
             for el in all_possible_words:
                 print('ai found', el)
+                (word, placement_type, anchor_coords) = el[1]
+                index = 0
+                if placement_type == PlacementType.HORIZONTAL:
+                    (end_x, end_y) = el[0]
+                    i = end_y - len(word)
+                    while i < end_y:
+                        self.remove_tile(word, end_x, i, index)
+                        self.game.board.fields[end_x][i].place_tile(Tile(word[index]))
+                        self.game.board.fields[end_x][i].confirm_tile()
+                        i += 1
+                        index += 1
+                else:
+                    (end_x, end_y) = el[0]
+                    i = end_x - len(word)
+                    while i < end_x:
+                        self.remove_tile(word, i, end_y, index)
+                        self.game.board.fields[i][end_y].place_tile(Tile(word[index]))
+                        self.game.board.fields[i][end_y].confirm_tile()
+                        i += 1
+                        index += 1
+                break
         else:
             pass
-    #         todo -> POST PASS
+            # todo -> POST PASS
 
     def __get_limit_of_left_part(self, field_position, anchors, placement_type):
         current_position = (field_position[0], field_position[1])
@@ -588,7 +634,7 @@ class AIPlayer(Player):
                                 self.cross_checks_board[i][anchor_column].add(l)
                             elif word in self.game.dictionary.possible_words:
                                 # if len(word) > 1:
-                                    # print('V - expanded', [i, anchor_column], 'letter', l, 'word', word)
+                                # print('V - expanded', [i, anchor_column], 'letter', l, 'word', word)
                                 self.cross_checks_board[i][anchor_column].add(l)
         else:
             anchor_rows = set()
@@ -604,7 +650,7 @@ class AIPlayer(Player):
                                 self.cross_checks_board[anchor_row][i].add(l)
                             elif word in self.game.dictionary.possible_words:
                                 # if len(word) > 1:
-                                    # print('H - expanded', [anchor_row, i], 'letter', l, 'word', word)
+                                # print('H - expanded', [anchor_row, i], 'letter', l, 'word', word)
                                 self.cross_checks_board[anchor_row][i].add(l)
 
     def __get_whole_word_expansion(self, field_coords, letter, placement_type):
