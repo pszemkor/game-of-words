@@ -233,7 +233,8 @@ class Game:
             print('Clicked that MAGIC BUTTON!!!')
             # validation
             try:
-                self.active_player.score += self.validator.verify_board(self.board)
+                self.validator.verify_board(self.board, self.round_no)
+                self.active_player.score += 1
                 print(self.active_player.score)
                 self.board.fix_all()
             except Exception as e:
