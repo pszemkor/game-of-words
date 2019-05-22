@@ -32,17 +32,44 @@ class FieldsContainer:
             field.is_active = True
             self.active_field = field
 
+class Bonus(Enum):
+    NO_BONUS = 1
+    BONUS_2L = 2
+    BONUS_3L = 3
+    BONUS_3W = 4
+    BONUS_2W = 5
+
+
 
 class Board(FieldsContainer):
     def __init__(self, ev_manager):
         # board with zeros
         super().__init__()
-        self.fields = [[Field(1) for i in range(config.BOARD_SIZE)] for j in range(config.BOARD_SIZE)]
+        self.fields = [[Field(Bonus.NO_BONUS) for i in range(config.BOARD_SIZE)] for j in range(config.BOARD_SIZE)]
         self.ev_manager = ev_manager
         self.ev_manager.register(self)
         #
         # event_to_send = events.BoardBuildEvent(self)
         # self.ev_manager.post(event_to_send)
+
+    #todo -> default file -> board.txt
+    def get_board_from_file(self):
+        row = 0
+        with open("board.txt", "r+") as f:
+            lines = f.readlines()
+            for line in lines:
+                line = line.split(", ")
+                line_iter = 0
+                for field in self.fields[row]:
+                    if line[line_iter].strip() == "2W":
+                        field.bonus = Bonus.BONUS_2W
+                    elif line[line_iter].strip() == "3W":
+                        field.bonus = Bonus.BONUS_3W
+                    elif line[line_iter].strip() == "2L":
+                        field.bonus = Bonus.BONUS_2L
+                    elif line[line_iter].strip() == "3L":
+                        field.bonus = Bonus.BONUS_3L
+
 
     def __str__(self):
         string = ""

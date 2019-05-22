@@ -34,6 +34,12 @@ class FieldSprite(pygame.sprite.Sprite):
             self.__field_colouring()
         elif self.field.state is model.FieldState.TEMPORARY:
             self.__field_colouring()
+        # else:
+        #     font = pygame.font.Font(None, config.FIELD_RECTANGLE[0])
+        #     text = "XD"
+        #     text_img = font.render(text, 1, (0, 0, 0))
+        #     text_rec = text_img.get_rect(center=(config.FIELD_RECTANGLE[0] // 2, config.FIELD_RECTANGLE[0] // 2))
+        #     self.image.blit(text_img, text_rec)
 
 
 class ButtonSprite(pygame.sprite.Sprite):
@@ -114,7 +120,7 @@ class GameView:
 
         pygame.init()
         self.window = pygame.display.set_mode((config.WINDOW_WIDTH, config.WINDOW_HEIGHT))
-        pygame.display.set_caption('Word of Games')
+        pygame.display.set_caption('Game of Words')
         self.background = pygame.Surface(self.window.get_size())
         self.background.fill((0, 0, 0))
         font = pygame.font.Font(None, 150)
