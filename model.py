@@ -3,7 +3,7 @@ import string
 # import io
 # import shutil
 import controller_events as events
-from enum import Enum
+from enum import Enum, IntEnum
 import config
 import controller
 from validator import Validator
@@ -33,16 +33,48 @@ class FieldsContainer:
             self.active_field = field
 
 
+class Bonus(IntEnum):
+    NO_BONUS = 1
+    BONUS_2L = 2
+    BONUS_3L = 3
+    BONUS_3W = 4
+    BONUS_2W = 5
+
+
+class ScoreBoard:
+    def __init__(self, players):
+        self.shape = config.SCOREBOARD_SHAPE
+        self.players = players
+
+
 class Board(FieldsContainer):
     def __init__(self, ev_manager):
         # board with zeros
         super().__init__()
-        self.fields = [[Field(1) for i in range(config.BOARD_SIZE)] for j in range(config.BOARD_SIZE)]
+        self.fields = [[Field(Bonus.NO_BONUS) for i in range(config.BOARD_SIZE)] for j in range(config.BOARD_SIZE)]
         self.ev_manager = ev_manager
         self.ev_manager.register(self)
         #
         # event_to_send = events.BoardBuildEvent(self)
         # self.ev_manager.post(event_to_send)
+
+    # todo -> default file -> board.txt
+    def get_board_from_file(self):
+        row = 0
+        with open("board.txt", "r+") as f:
+            lines = f.readlines()
+            for line in lines:
+                line = line.split(", ")
+                line_iter = 0
+                for field in self.fields[row]:
+                    if line[line_iter].strip() == "2W":
+                        field.bonus = Bonus.BONUS_2W
+                    elif line[line_iter].strip() == "3W":
+                        field.bonus = Bonus.BONUS_3W
+                    elif line[line_iter].strip() == "2L":
+                        field.bonus = Bonus.BONUS_2L
+                    elif line[line_iter].strip() == "3L":
+                        field.bonus = Bonus.BONUS_3L
 
     def __str__(self):
         string = ""
@@ -136,6 +168,7 @@ class Game:
         self.bags_of_letters = BagOfLetters()
         self.turn = None
         self.validator = Validator(ev_manager, self.dictionary.possible_words)
+        self.round_no = -1
         # ev = events.DrawGameButtonsEvent()
         # self.ev_manager.post(ev)
 
@@ -229,7 +262,16 @@ class Game:
         elif isinstance(event, events.FactButtonPressedEvent):
             pass
         elif isinstance(event, events.PassButtonPressedEvent):
-            pass
+            self.active_player.pass_strike += 1
+            if self.active_player.pass_strike == 2 and self.players[self.index_of_next_player()].pass_strike == 2:
+                # todo post end of game!!!!
+                pass
+            else:
+                if self.round_no > 0:
+                    self.set_active_player(self.players[self.index_of_next_player()])
+                    self.ev_manager.post(events.NextPlayerMoveStartedEvent(self))
+                else:
+                    print("CANNOT USE PASS BUTTON DURING FIRST ROUND!")
 
 
 
@@ -250,6 +292,8 @@ class Game:
                 self.ev_manager.post(events.DrawGameButtonsEvent())
                 self.ev_manager.post(events.BoardBuildEvent(self.board))
                 self.ev_manager.post(events.TileBoxBuildEvent(self.active_player.tilebox))
+                self.ev_manager.post(events.ScoreBoardBuildEvent(ScoreBoard(self.players)))
+                self.round_no += 1
                 # todo -> scoreboard build event
 
             else:

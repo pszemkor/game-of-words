@@ -34,6 +34,12 @@ class FieldSprite(pygame.sprite.Sprite):
             self.__field_colouring()
         elif self.field.state is model.FieldState.TEMPORARY:
             self.__field_colouring()
+        # else:
+        #     font = pygame.font.Font(None, config.FIELD_RECTANGLE[0])
+        #     text = "XD"
+        #     text_img = font.render(text, 1, (0, 0, 0))
+        #     text_rec = text_img.get_rect(center=(config.FIELD_RECTANGLE[0] // 2, config.FIELD_RECTANGLE[0] // 2))
+        #     self.image.blit(text_img, text_rec)
 
 
 class ButtonSprite(pygame.sprite.Sprite):
@@ -80,6 +86,26 @@ class BannerSprite(pygame.sprite.Sprite):
         self.__blit()
 
 
+class ScoreBoardSprite(pygame.sprite.Sprite):
+    def __init__(self, score_board, group=None):
+        pygame.sprite.Sprite.__init__(self, group)
+        self.players = score_board.players
+        self.shape = score_board.shape
+        self.image = pygame.Surface(self.shape)
+        self.update()
+
+    def __blit(self):
+        font = pygame.font.Font(None, 15)
+        score_text = "Player 1: " + str(self.players[0].score) + " Player 2: " + str(self.players[1].score)
+        text_img = font.render(score_text, 1, (150, 150, 150))
+        text_rec = text_img.get_rect(center=(self.shape[0] // 2, self.shape[1] // 2))
+        self.image.blit(text_img, text_rec)
+
+    def update(self, *args):
+        self.image.fill((80, 80, 80))
+        self.__blit()
+
+
 class ButtonShapeType(Enum):
     RECTANGLE = 0
     CIRCLE = 1
@@ -114,7 +140,7 @@ class GameView:
 
         pygame.init()
         self.window = pygame.display.set_mode((config.WINDOW_WIDTH, config.WINDOW_HEIGHT))
-        pygame.display.set_caption('Word of Games')
+        pygame.display.set_caption('Game of Words')
         self.background = pygame.Surface(self.window.get_size())
         self.background.fill((0, 0, 0))
         font = pygame.font.Font(None, 150)
@@ -206,9 +232,9 @@ class GameView:
 
     def show_other_player_move_banner(self, player):
         self.background = pygame.Surface(self.window.get_size())
-        self.background.fill((0,0,0))
+        self.background.fill((0, 0, 0))
         font = pygame.font.Font(None, 150)
-        #text = "Brace yourself for\n" + player.get_name() + "\nmove!"
+        # text = "Brace yourself for\n" + player.get_name() + "\nmove!"
         text = "Brave yourself!"
         text_img = font.render(text, 1, (255, 255, 255))
         text_rec = text_img.get_rect(center=(config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2))
@@ -216,11 +242,15 @@ class GameView:
         self.window.blit(self.background, (0, 0))
         pygame.display.flip()
 
-
     def get_field_sprite(self, field):
         for sprite in self.back_sprites:
             if hasattr(sprite, "field") and sprite.field == field:
                 return sprite
+
+    def show_score_board(self, score_board):
+        score_board_rect = pygame.Rect(800, 50, *config.SCOREBOARD_SHAPE)
+        new_score_board_sprite = ScoreBoardSprite(score_board, self.front_sprites)
+        new_score_board_sprite.rect = score_board_rect
 
     def notify(self, event):
         if isinstance(event, events.TickEvent):
@@ -236,3 +266,5 @@ class GameView:
         elif isinstance(event, events.OtherPlayerTurnEvent):
             self.clean()
             self.show_other_player_move_banner(event.player)
+        elif isinstance(event, events.ScoreBoardBuildEvent):
+            self.show_score_board(event.score_board)
