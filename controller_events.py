@@ -43,6 +43,13 @@ class GameStartedEvent(Event):
 
 
 # Initialize game events
+class ScoreBoardBuildEvent(Event):
+    def __init__(self, score_board):
+        super().__init__()
+        self.name = "ScoreBoardBuildEvent"
+        self.score_board = score_board
+
+
 class BoardBuildEvent(Event):
     def __init__(self, board):
         super().__init__()

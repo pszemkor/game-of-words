@@ -41,6 +41,12 @@ class Bonus(IntEnum):
     BONUS_2W = 5
 
 
+class ScoreBoard:
+    def __init__(self, players):
+        self.shape = config.SCOREBOARD_SHAPE
+        self.players = players
+
+
 class Board(FieldsContainer):
     def __init__(self, ev_manager):
         # board with zeros
@@ -286,6 +292,7 @@ class Game:
                 self.ev_manager.post(events.DrawGameButtonsEvent())
                 self.ev_manager.post(events.BoardBuildEvent(self.board))
                 self.ev_manager.post(events.TileBoxBuildEvent(self.active_player.tilebox))
+                self.ev_manager.post(events.ScoreBoardBuildEvent(ScoreBoard(self.players)))
                 self.round_no += 1
                 # todo -> scoreboard build event
 
