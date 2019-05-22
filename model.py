@@ -78,16 +78,26 @@ class Board(FieldsContainer):
 class Dictionary:
     def __init__(self):
         possible_words_set = set()
-        for c in string.ascii_uppercase:
-            file = "words/" + c + "word.csv"
-            with open(file, 'r', encoding='UTF-8', newline='') as csvFile:
-                reader = csv.reader(csvFile)
-                print("Read file", file)
-                for row in reader:
-                    word = ''.join(x for x in row[0] if x.isalpha())
-                    if word == 'oft':
-                        print('will add oft to set', word)
-                    possible_words_set.add(word)
+        # for c in string.ascii_uppercase:
+        #     file = "words/" + c + "word.csv"
+        #     with open(file, 'r', encoding='UTF-8', newline='') as csvFile:
+        #         reader = csv.reader(csvFile)
+        #         print("Read file", file)
+        #         for row in reader:
+        #             word = ''.join(x for x in row[0] if x.isalpha())
+        #             if word == 'oft':
+        #                 print('will add oft to set', word)
+        #             possible_words_set.add(word)
+
+        possible_words_list = filter(lambda x: len(x) > 1, sorted(list(possible_words_set)))
+        self.possible_words = dawg.CompletionDAWG(possible_words_list)
+
+    def load_txt_file(self, file_path):
+        possible_words_set = set()
+        with open(file_path, 'r', encoding='UTF-8', newline='') as txt_file:
+            for row in txt_file:
+                word = ''.join(x.lower() for x in row if x.isalpha())
+                possible_words_set.add(word)
 
         possible_words_list = filter(lambda x: len(x) > 1, sorted(list(possible_words_set)))
         self.possible_words = dawg.CompletionDAWG(possible_words_list)
@@ -133,6 +143,7 @@ class Game:
         self.players = []
         self.active_player = None
         self.dictionary = Dictionary()
+        self.dictionary.load_txt_file('./collins_dict/Collins Scrabble Words.txt')
         self.bags_of_letters = BagOfLetters()
         self.turn = None
         self.validator = Validator(ev_manager, self.dictionary.possible_words)
