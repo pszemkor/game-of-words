@@ -410,12 +410,12 @@ class AIPlayer(Player):
         self.score = 0
 
     def remove_tile(self, word, x, y, index):
-        # if self.game.board.fields[x][y].state == FieldState.EMPTY:
-        #     for field in self.tilebox.fields:
-        #         if field.tile.character == word[index]:
-        #             self.score += field.tile.get_value()
-        #             field.state = FieldState.EMPTY
-        #             field.tile = None
+        if self.game.board.fields[x][y].state == FieldState.EMPTY:
+            for field in self.tilebox.fields:
+                if field.state != FieldState.EMPTY and field.tile.character == word[index]:
+                    self.score += field.tile.get_value()
+                    field.state = FieldState.EMPTY
+                    field.tile = None
         pass
 
     def make_turn(self):
@@ -423,7 +423,7 @@ class AIPlayer(Player):
         self.get_all_possible_words()
         all_possible_words = self.all_possible_words_dict.items()
         # print("Found such possible words", all_possible_words)
-        print("Tilebox of AI player", self.tilebox.fields)
+        print("Tilebox of AI player", self.tilebox_list)
 
         if all_possible_words is not []:
             for el in all_possible_words:
