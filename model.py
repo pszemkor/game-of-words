@@ -14,6 +14,7 @@ import itertools
 import dawg
 
 
+
 # todo -> algo do "AI"
 # todo ->
 
@@ -233,7 +234,8 @@ class Game:
             print('Clicked that MAGIC BUTTON!!!')
             # validation
             try:
-                self.validator.verify_board(self.board, self.round_no)
+                newly_added, tiles_with_fixed_neighbours = self.validator.verify_board(self.board, self.round_no)
+                scoreCounter = score.ScoreCo
                 self.active_player.score += 1
                 print(self.active_player.score)
                 self.board.fix_all()

@@ -17,15 +17,28 @@ class Validator:
             if horizontal_sorted[0][0] == horizontal_sorted[1][0]:
                 for i in range(len(horizontal_sorted) - 1):
                     if horizontal_sorted[i][0] != horizontal_sorted[i + 1][0]:
-                        print("H: ",horizontal_sorted[i][0], horizontal_sorted[i + 1][0])
+                        print("H: ", horizontal_sorted[i][0], horizontal_sorted[i + 1][0])
                         return False
             else:
                 for i in range(len(vertical_sorted) - 1):
                     if vertical_sorted[i][1] != vertical_sorted[i + 1][1]:
-                        print("V: ",vertical_sorted[i][1], vertical_sorted[i + 1][1])
+                        print("V: ", vertical_sorted[i][1], vertical_sorted[i + 1][1])
                         return False
 
         return True
+
+    def __check_whether_one_word(self, board, newly_added):
+        horizontal_sorted = sorted(newly_added, key=lambda x: x[1])
+        vertical_sorted = sorted(newly_added, key=lambda x: x[0])
+        if horizontal_sorted[0][0] == horizontal_sorted[1][0]:
+            for y in range(horizontal_sorted[0][1], horizontal_sorted[::-1][0][1] + 1):
+                if board.fields[horizontal_sorted[0][0]][y].state == model.FieldState.EMPTY:
+                    raise Exception("Tiles don't belong to one word!")
+
+        else:
+            for x in range(vertical_sorted[0][0], vertical_sorted[::-1][0][0] + 1):
+                if board.fields[x][vertical_sorted[0][1]].state == model.FieldState.EMPTY:
+                    raise Exception("Tiles don't belong to one word!")
 
     def __check_fixed_neighbour(self, pos, board):
         x_dirs = [1, 0, -1, 0]
@@ -110,8 +123,8 @@ class Validator:
         for pos in newly_added:
             if self.__check_fixed_neighbour(pos, board):
                 tiles_with_fixed_neighbour.append(pos)
-
-        if round == 0 :
+        self.__check_whether_one_word(board, newly_added)
+        if round == 0:
             if (config.BOARD_SIZE // 2, config.BOARD_SIZE // 2) not in newly_added:
                 raise Exception("You have to start from the mid!")
             if len(newly_added) == 1:
@@ -135,6 +148,5 @@ class Validator:
                 raise Exception("None of tiles has fixed neighbour")
             for pos in tiles_with_fixed_neighbour:
                 self.__verify_check_cross(pos, board)
-
 
         return newly_added, tiles_with_fixed_neighbour
