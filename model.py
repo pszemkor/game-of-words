@@ -3,7 +3,7 @@ import string
 # import io
 # import shutil
 import controller_events as events
-from enum import Enum
+from enum import Enum, IntEnum
 import config
 import controller
 from validator import Validator
@@ -32,13 +32,13 @@ class FieldsContainer:
             field.is_active = True
             self.active_field = field
 
-class Bonus(Enum):
+
+class Bonus(IntEnum):
     NO_BONUS = 1
     BONUS_2L = 2
     BONUS_3L = 3
     BONUS_3W = 4
     BONUS_2W = 5
-
 
 
 class Board(FieldsContainer):
@@ -52,7 +52,7 @@ class Board(FieldsContainer):
         # event_to_send = events.BoardBuildEvent(self)
         # self.ev_manager.post(event_to_send)
 
-    #todo -> default file -> board.txt
+    # todo -> default file -> board.txt
     def get_board_from_file(self):
         row = 0
         with open("board.txt", "r+") as f:
@@ -69,7 +69,6 @@ class Board(FieldsContainer):
                         field.bonus = Bonus.BONUS_2L
                     elif line[line_iter].strip() == "3L":
                         field.bonus = Bonus.BONUS_3L
-
 
     def __str__(self):
         string = ""
@@ -163,6 +162,7 @@ class Game:
         self.bags_of_letters = BagOfLetters()
         self.turn = None
         self.validator = Validator(ev_manager, self.dictionary.possible_words)
+        self.round_no = -1
         # ev = events.DrawGameButtonsEvent()
         # self.ev_manager.post(ev)
 
@@ -256,7 +256,16 @@ class Game:
         elif isinstance(event, events.FactButtonPressedEvent):
             pass
         elif isinstance(event, events.PassButtonPressedEvent):
-            pass
+            self.active_player.pass_strike += 1
+            if self.active_player.pass_strike == 2 and self.players[self.index_of_next_player()].pass_strike == 2:
+                # todo post end of game!!!!
+                pass
+            else:
+                if self.round_no > 0:
+                    self.set_active_player(self.players[self.index_of_next_player()])
+                    self.ev_manager.post(events.NextPlayerMoveStartedEvent(self))
+                else:
+                    print("CANNOT USE PASS BUTTON DURING FIRST ROUND!")
 
 
 
@@ -277,6 +286,7 @@ class Game:
                 self.ev_manager.post(events.DrawGameButtonsEvent())
                 self.ev_manager.post(events.BoardBuildEvent(self.board))
                 self.ev_manager.post(events.TileBoxBuildEvent(self.active_player.tilebox))
+                self.round_no += 1
                 # todo -> scoreboard build event
 
             else:
