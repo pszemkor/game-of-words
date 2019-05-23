@@ -1,4 +1,5 @@
 import view
+import config
 
 
 class Event:
@@ -43,6 +44,11 @@ class GameStartedEvent(Event):
 
 
 # Initialize game events
+class ClearScreenEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "CleanScreenEvent"
+
 class ScoreBoardBuildEvent(Event):
     def __init__(self, score_board):
         super().__init__()
@@ -62,6 +68,25 @@ class TileBoxBuildEvent(Event):
         super().__init__()
         self.name = "Build TileBox Event"
         self.tilebox = tilebox
+
+
+class MenuBuildEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = 'MenuBuildEvent'
+        play_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Play', 43, (51, 255, 53), (200, 80),
+                                  config.WINDOW_WIDTH // 2 - 100, 300)
+        set_difficulty_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Set difficulty', 21, (51, 255, 53),
+                                            (180, 80), config.WINDOW_WIDTH // 2 - 90, 400)
+        edit_board_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Edit board', 21, (51, 255, 53), (180, 80),
+                                        config.WINDOW_WIDTH // 2 - 90, 500)
+        about_button = view.Button(view.ButtonShapeType.RECTANGLE, 'About', 21, (51, 255, 53), (180, 80),
+                                   config.WINDOW_WIDTH // 2 - 90, 600)
+        self.buttons = []
+        self.buttons.append(play_button)
+        self.buttons.append(set_difficulty_button)
+        self.buttons.append(edit_board_button)
+        self.buttons.append(about_button)
 
 
 # superior event for buttons
@@ -159,6 +184,13 @@ class NextPlayerMoveStartedEvent(Event):
         super().__init__()
         self.name = "NextPlayerMoveStartedEvent"
         self.game = game
+
+
+class OtherPlayerTurnEvent(Event):
+    def __init__(self, player):
+        super().__init__()
+        self.player = player
+        self.name = "OtherPlayerTurnEvent"
 
 
 class OtherPlayerTurnEvent(Event):

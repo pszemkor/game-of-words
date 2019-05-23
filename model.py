@@ -296,6 +296,7 @@ class Game:
 
 
         elif isinstance(event, events.NextPlayerMoveStartedEvent):
+            self.ev_manager.post(events.ClearScreenEvent())
             self.board = event.game.board
             self.players = event.game.players
             self.active_player = event.game.active_player
@@ -309,6 +310,7 @@ class Game:
                     print(str(e))
                     pass
 
+
                 self.ev_manager.post(events.DrawGameButtonsEvent())
                 self.ev_manager.post(events.BoardBuildEvent(self.board))
                 self.ev_manager.post(events.TileBoxBuildEvent(self.active_player.tilebox))
@@ -317,6 +319,7 @@ class Game:
                 # todo -> scoreboard build event
 
             else:
+                self.ev_manager.post(events.ClearScreenEvent())
                 self.ev_manager.post(events.OtherPlayerTurnEvent(self.active_player))
                 if isinstance(self.active_player, AIPlayer):
                     self.active_player.refill_tilebox()
@@ -418,6 +421,9 @@ class Player:
         self.pass_strike = 0
         self.name = "Default"
         self.game = game
+
+    def set_name(self, name):
+        self.name = name
 
     def refill_tilebox(self):
 
