@@ -38,9 +38,9 @@ class ScoreCounter:
         for i in range(len(x_dirs)):
             x_neigh = pos[0] + x_dirs[i]
             y_neigh = pos[1] + y_dirs[i]
-
-            if board.fields[x_neigh][y_neigh].state == model.FieldState.FIXED:
-                return True
+            if 0 <= x_neigh < config.BOARD_SIZE and 0 <= y_neigh < config.BOARD_SIZE:
+                if board.fields[x_neigh][y_neigh].state == model.FieldState.FIXED:
+                    return True
         return False
 
     def __get_tiles_with_fixed_neighbours(self):
@@ -59,7 +59,7 @@ class ScoreCounter:
                 score += self.board.fields[pos[0]][y].tile.get_value()
                 print("H coords", pos[0], y)
 
-        if pos[1] - 1 >= 0 and self.board.fields[pos[0]][pos[1] + 1].state == model.FieldState.FIXED:
+        if pos[1] - 1 >= 0 and self.board.fields[pos[0]][pos[1] - 1].state == model.FieldState.FIXED:
             for y in range(pos[1] - 1, -1, -1):
                 if self.board.fields[pos[0]][y].state == model.FieldState.EMPTY:
                     break
@@ -76,7 +76,7 @@ class ScoreCounter:
                 score += self.board.fields[x][pos[1]].tile.get_value()
                 print("V coords", x, pos[1])
 
-        if pos[0] - 1 >= 0 and self.board.fields[pos[0]][pos[1] + 1].state == model.FieldState.FIXED:
+        if pos[0] - 1 >= 0 and self.board.fields[pos[0]-1][pos[1]].state == model.FieldState.FIXED:
             for x in range(pos[0] - 1, -1, -1):
                 if self.board.fields[x][pos[1]].state == model.FieldState.EMPTY:
                     break
@@ -90,6 +90,8 @@ class ScoreCounter:
             self.newly_added = self.__get_newly_added()
             print("BLAAAAAAAAH")
             print(self.newly_added)
+            if len(self.newly_added) == 0:
+                return 0
         if self.tiles_with_fixed_neighbours is None:
             self.tiles_with_fixed_neighbours = self.__get_tiles_with_fixed_neighbours()
 
