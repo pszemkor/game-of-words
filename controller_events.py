@@ -112,6 +112,7 @@ class DrawGameButtonsEvent(ButtonEvent):
         take_all = view.Button(view.ButtonShapeType.RECTANGLE, 'Return', 15, (80,80,80), (100, 50), 90,
                                         270)
 
+
         self.buttons = []
         self.buttons.append(confirm_button)
         self.buttons.append(shuffle_button)
@@ -211,6 +212,12 @@ class EndGameEvent(Event):
         super().__init__()
         self.players = players
         self.name = "EndGameEvent"
+
+
+class SurrenderEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "SurrenderEvent"
 
 
 class AboutBannerShowEvent(Event):

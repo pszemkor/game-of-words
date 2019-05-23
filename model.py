@@ -288,7 +288,8 @@ class Game:
             self.ev_manager.post(events.TileBoxBuildEvent(self.active_player.tilebox))
 
         elif isinstance(event, events.SurrenderButtonPressedEvent):
-            pass
+            print("SURRENDER!!!!")
+            self.ev_manager.post(events.SurrenderEvent())
 
         elif isinstance(event, events.TakeAllButtonEvent):
             self.active_player.put_all_temps_in_tilebox()
