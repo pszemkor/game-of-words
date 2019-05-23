@@ -175,6 +175,12 @@ class BagOfLetters:
             self.available_letters[l] += 1
 
 
+class DifficultyLevel(Enum):
+    EASY = 0
+    MEDIUM = 1
+    HARD = 2
+
+
 # game has 2 players, board, possible_words  and validator
 class Game:
     def __init__(self, ev_manager):
@@ -190,11 +196,15 @@ class Game:
         self.turn = None
         self.validator = Validator(ev_manager, self.dictionary.possible_words)
         self.round_no = -1
+        self.difficulty_level = DifficultyLevel.MEDIUM
         # ev = events.DrawGameButtonsEvent()
         # self.ev_manager.post(ev)
 
     def __str__(self):
         return self.board.__str__()
+
+    def set_difficulty_level(self, difficulty_level):
+        self.difficulty_level = difficulty_level
 
     def get_index_of_active_player(self):
         for i, p in enumerate(self.players):
