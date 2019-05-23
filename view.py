@@ -308,8 +308,15 @@ class GameView:
     def game_end(self, event):
         if event.players[0].score > event.players[1].score:
             self.clean("images/win_view.jpg")
+            self.print_line("You", (config.WINDOW_WIDTH / 4 - 70, 120), 100)
+            self.print_line("WIN!", (config.WINDOW_WIDTH / 2 + 230, 300), 100)
+
         else:
             self.clean("images/surrender_screen.jpg")
+            self.print_line("You", (config.WINDOW_WIDTH / 4 - 70, 90), 70, (0, 0, 0))
+            self.print_line("have", (config.WINDOW_WIDTH / 2 + 200, 120), 70, (0, 0, 0))
+            self.print_line("been", (config.WINDOW_WIDTH / 4 - 50, 200), 70, (0, 0, 0))
+            self.print_line("DEFEATED!", (config.WINDOW_WIDTH / 2 + 230, 280), 70, (0, 0, 0))
 
     def surrender(self):
         print("DONE")
@@ -318,6 +325,7 @@ class GameView:
         self.print_line("have", (config.WINDOW_WIDTH / 2 + 200, 120), 70, (0,0,0))
         self.print_line("been", (config.WINDOW_WIDTH / 4 - 50, 200), 70, (0, 0, 0))
         self.print_line("DEFEATED!", (config.WINDOW_WIDTH / 2 + 230, 280), 70, (0, 0, 0))
+
 
     def notify(self, event):
         if isinstance(event, events.TickEvent):
