@@ -244,6 +244,7 @@ class Game:
                 newly_added, tiles_with_fixed_neighbours = self.validator.verify_board(self.board, self.round_no)
                 #todo -> score
                 score_counter = SC.ScoreCounter(self.board)
+                print("PLAYER SCORE: (pre) ", self.active_player.score)
                 self.active_player.score += score_counter.count_score()
                 print("PLAYER SCORE: ", self.active_player.score)
                 self.board.fix_all()
@@ -383,7 +384,7 @@ class Tile:
 
     def get_value(self):
         # TO DO -> handle '?' tiles
-        if self.character in "eaionrtlsu":
+        if self.character in "eaionrtlsu?":
             return 1
         elif self.character in "dg":
             return 2
@@ -480,7 +481,6 @@ class AIPlayer(Player):
         if self.game.board.fields[x][y].state == FieldState.EMPTY:
             for field in self.tilebox.fields:
                 if field.state != FieldState.EMPTY and field.tile.character == word[index]:
-                    self.score += field.tile.get_value()
                     field.state = FieldState.EMPTY
                     field.tile = None
         pass

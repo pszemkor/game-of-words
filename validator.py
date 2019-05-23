@@ -1,5 +1,7 @@
 import config
 import model
+import itertools
+import string
 
 
 class Validator:
@@ -8,7 +10,20 @@ class Validator:
         self.dawg = dawg
 
     def check_word(self, word):
-        return word in self.dawg
+        wildcards = []
+        for i in range(len(word)):
+            if word[i] == "?":
+                wildcards.append(i)
+        if len(wildcards) == 0:
+            return word in self.dawg
+        permutations = itertools.permutations(string.ascii_lowercase, len(wildcards))
+        for p in permutations:
+            for i in range(len(wildcards)):
+                word = list(word)
+                word[wildcards[i]] = p[i]
+                if "".join(word) in self.dawg:
+                    return True
+        return False
 
     def __check_whether_one_line(self, newly_added):
         horizontal_sorted = sorted(newly_added, key=lambda x: x[1])
@@ -123,7 +138,6 @@ class Validator:
             print(newly_added)
             raise Exception("Tiles are not in one line!")
 
-        print("here1")
         tiles_with_fixed_neighbour = []
         for pos in newly_added:
             if self.__check_fixed_neighbour(pos, board):
@@ -131,7 +145,6 @@ class Validator:
 
         self.__check_whether_one_word(board, newly_added)
 
-        print("here1")
         if round == 0:
             if (config.BOARD_SIZE // 2, config.BOARD_SIZE // 2) not in newly_added:
                 raise Exception("You have to start from the mid!")

@@ -28,7 +28,6 @@ class ScoreCounter:
         newly = []
         for i in range(config.BOARD_SIZE):
             for j in range(config.BOARD_SIZE):
-                print(self.board.fields[i][j].state)
                 if self.board.fields[i][j].state == model.FieldState.TEMPORARY:
                     newly.append((i, j))
         return newly
@@ -128,7 +127,7 @@ class ScoreCounter:
                     score += self.board.fields[x][y].tile.get_value() * self.__count_letter_bonus((x, y))
                 else:
                     break
-
+            print("score: ", score)
             for pos in horizontal_sorted:
                 word_bonus_factor *= self.__count_word_bonus(pos)
                 print("GOT BONUS FOR WORD: ", word_bonus_factor)
@@ -138,7 +137,7 @@ class ScoreCounter:
 
             for pos in self.tiles_with_fixed_neighbours:
                 print("counting extra vertical for letter: ", self.board.fields[pos[0]][pos[1]].tile.character, pos)
-                score += self.vertical_word_score(pos) + self.board.fields[pos[0]][pos[1]]
+                score += self.vertical_word_score(pos) + self.board.fields[pos[0]][pos[1]].tile.get_value()
                 score *= self.__count_word_bonus(pos)
                 print("got: ", self.vertical_word_score(pos))
 
@@ -174,6 +173,6 @@ class ScoreCounter:
             score *= word_bonus_factor
 
             for pos in self.tiles_with_fixed_neighbours:
-                score += self.horizontal_word_score(pos) + self.board.fields[pos[0]][pos[1]]
+                score += self.horizontal_word_score(pos) + self.board.fields[pos[0]][pos[1]].tile.get_value()
                 score *= self.__count_word_bonus(pos)
         return score
