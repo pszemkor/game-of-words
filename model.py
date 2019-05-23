@@ -298,7 +298,7 @@ class Game:
 
 
         elif isinstance(event, events.NextPlayerMoveStartedEvent):
-            self.ev_manager.post(events.ClearScreenEvent())
+            self.ev_manager.post(events.ClearScreenEvent("./images/background.jpg"))
             self.board = event.game.board
             self.players = event.game.players
             self.active_player = event.game.active_player

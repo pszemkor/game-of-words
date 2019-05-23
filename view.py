@@ -165,13 +165,10 @@ class GameView:
         pygame.display.set_caption('Game of Words')
         self.background = pygame.Surface(self.window.get_size())
         self.background.fill((0, 0, 0))
-        font = pygame.font.Font(config.FONT_PATH, 150)
-        text = "Game of Words"
-        text_img = font.render(text, 1, (255, 255, 255))
-        text_rec = text_img.get_rect(center=(config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2))
-        self.background.blit(text_img, text_rec)
-        self.window.blit(self.background, (0, 0))
-        pygame.display.flip()
+
+        self.print_line("Game", (config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2-200), 150)
+        self.print_line("of", (config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2), 150)
+        self.print_line("Words", (config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2 + 200), 150)
 
         self.back_sprites = pygame.sprite.RenderUpdates()
         self.front_sprites = pygame.sprite.RenderUpdates()
@@ -180,8 +177,8 @@ class GameView:
         # pygame.time.delay(200)
 
     def show_board(self, board):
-        self.background.fill((0, 0, 0))
-        self.window.blit(self.background, (0, 0))
+        # self.background.fill((0, 0, 0))
+        # self.window.blit(self.background, (0, 0))
         pygame.display.flip()
 
         # field_rect = pygame.Rect(
@@ -245,10 +242,17 @@ class GameView:
         dirty_rects = dirty_rects1 + dirty_rects2
         pygame.display.update(dirty_rects)
 
-    def clean(self):
+    def clean(self, image_path=None):
         self.back_sprites = pygame.sprite.RenderUpdates()
         self.front_sprites = pygame.sprite.RenderUpdates()
-        self.background.fill((0, 0, 0))
+        if image_path is not None:
+            image = pygame.image.load(image_path)
+            rect = image.get_rect()
+            rect.left, rect.top = (0, 0)
+            self.background.fill([255, 255, 255])
+            self.background.blit(image, rect)
+        else:
+            self.background.fill((0, 0, 0))
         self.window.blit(self.background, (0, 0))
         pygame.display.flip()
 
@@ -330,7 +334,7 @@ class GameView:
         elif isinstance(event, events.MenuBuildEvent):
             self.build_menu_event(event.buttons)
         elif isinstance(event, events.ClearScreenEvent):
-            self.clean()
+            self.clean(event.image_path)
         elif isinstance(event, events.AboutBannerShowEvent):
             self.clean()
             self.show_about_banner()

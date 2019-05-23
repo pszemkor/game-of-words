@@ -45,9 +45,10 @@ class GameStartedEvent(Event):
 
 # Initialize game events
 class ClearScreenEvent(Event):
-    def __init__(self):
+    def __init__(self, image_path=None):
         super().__init__()
         self.name = "CleanScreenEvent"
+        self.image_path = image_path
 
 
 class ScoreBoardBuildEvent(Event):
@@ -205,4 +206,3 @@ class AboutBannerShowEvent(Event):
     def __init__(self):
         super().__init__()
         self.name = "AboutBannerShowEvent"
-
