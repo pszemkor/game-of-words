@@ -52,7 +52,6 @@ class FieldSprite(pygame.sprite.Sprite):
             self.image.blit(text_img, text_rec)
 
 
-
 class ButtonSprite(pygame.sprite.Sprite):
     def __init__(self, button, group=None):
         pygame.sprite.Sprite.__init__(self, group)
@@ -108,9 +107,17 @@ class ScoreBoardSprite(pygame.sprite.Sprite):
     def __blit(self):
         font = pygame.font.Font(None, 15)
         score_text = "Player 1: " + str(self.players[0].score) + " Player 2: " + str(self.players[1].score)
-        text_img = font.render(score_text, 1, (150, 150, 150))
-        text_rec = text_img.get_rect(center=(self.shape[0] // 2, self.shape[1] // 2))
+        text_img = font.render(score_text, 1, (250, 250, 250))
+        text_rec = text_img.get_rect(center=(self.shape[0] // 3, self.shape[1] // 3))
         self.image.blit(text_img, text_rec)
+
+        font = pygame.font.Font(None, 15)
+        score_text = "Player 1: " + str(self.players[0].score) + " Player 2: " + str(self.players[1].score)
+        text_img = font.render(score_text, 1, (250, 250, 250))
+        text_rec = text_img.get_rect(center=(2*self.shape[0] // 3, 2*self.shape[1] // 3))
+        self.image.blit(text_img, text_rec)
+
+
 
     def update(self, *args):
         self.image.fill((80, 80, 80))
@@ -259,7 +266,8 @@ class GameView:
                 return sprite
 
     def show_score_board(self, score_board):
-        score_board_rect = pygame.Rect(800, 50, *config.SCOREBOARD_SHAPE)
+        score_board_rect = pygame.Rect(config.LEFT_EDGE_SCOREBOARD_OFFSET, config.TOP_EDGE_SCOREBOARD_OFFSET,
+                                       *config.SCOREBOARD_SHAPE)
         new_score_board_sprite = ScoreBoardSprite(score_board, self.front_sprites)
         new_score_board_sprite.rect = score_board_rect
 
