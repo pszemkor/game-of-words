@@ -101,7 +101,9 @@ class MouseEventHandler:
             elif hasattr(sprite, 'button') and sprite.button.text == 'Play':
                 ev_to_send = events.NextPlayerMoveStartedEvent(self.game)
                 return ev_to_send
-
+            elif hasattr(sprite, 'button') and sprite.button.text == 'About':
+                ev_to_send = events.AboutBannerShowEvent()
+                return ev_to_send
 
 class MouseController:
     def __init__(self, event_manager, view_, game):

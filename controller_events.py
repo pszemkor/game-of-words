@@ -49,6 +49,7 @@ class ClearScreenEvent(Event):
         super().__init__()
         self.name = "CleanScreenEvent"
 
+
 class ScoreBoardBuildEvent(Event):
     def __init__(self, score_board):
         super().__init__()
@@ -198,3 +199,10 @@ class EndGameEvent(Event):
         super().__init__()
         self.players = players
         self.name = "EndGameEvent"
+
+
+class AboutBannerShowEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "AboutBannerShowEvent"
+
