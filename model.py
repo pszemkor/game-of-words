@@ -12,6 +12,9 @@ from validator import Validator
 from collections import Counter
 import itertools
 import dawg
+import score as SC
+import view
+
 
 
 # todo -> algo do "AI"
@@ -240,9 +243,9 @@ class Game:
             try:
                 newly_added, tiles_with_fixed_neighbours = self.validator.verify_board(self.board, self.round_no)
                 #todo -> score
-
-                self.active_player.score += 1
-                print(self.active_player.score)
+                score_counter = SC.ScoreCounter(self.board)
+                self.active_player.score += score_counter.count_score()
+                print("PLAYER SCORE: ", self.active_player.score)
                 self.board.fix_all()
             except Exception as e:
                 print(str(e))
@@ -267,7 +270,6 @@ class Game:
             for field in self.active_player.tilebox.fields:
                 if field.state != FieldState.TEMPORARY:
                     continue
-                print(tiles[i])
                 field.tile = tiles[i]
                 i += 1
 
@@ -319,6 +321,10 @@ class Game:
                     self.active_player.refill_tilebox()
                     self.active_player.make_turn()
                     # todo -> score of AI !!!!
+                    score_counter = SC.ScoreCounter(self.board)
+                    print("AI SCORE: (pre) ", self.active_player.score)
+                    self.active_player.score += score_counter.count_score()
+                    print("AI SCORE: ", self.active_player.score)
                     self.board.fix_all()
                     self.set_active_player(self.players[self.index_of_next_player()])
                     self.ev_manager.post(events.NextPlayerMoveStartedEvent(self))
@@ -497,8 +503,9 @@ class AIPlayer(Player):
                     i = end_y - len(word)
                     while i < end_y:
                         self.remove_tile(word, end_x, i, index)
-                        self.game.board.fields[end_x][i].place_tile(Tile(word[index]))
-                        self.game.board.fields[end_x][i].confirm_tile()
+                        if self.game.board.fields[end_x][i].state == FieldState.EMPTY:
+                            self.game.board.fields[end_x][i].place_tile(Tile(word[index]))
+                        # self.game.board.fields[end_x][i].confirm_tile()
                         i += 1
                         index += 1
                 else:
@@ -507,7 +514,7 @@ class AIPlayer(Player):
                     while i < end_x:
                         self.remove_tile(word, i, end_y, index)
                         self.game.board.fields[i][end_y].place_tile(Tile(word[index]))
-                        self.game.board.fields[i][end_y].confirm_tile()
+                        # self.game.board.fields[i][end_y].confirm_tile()
                         i += 1
                         index += 1
                 break
@@ -667,7 +674,6 @@ class AIPlayer(Player):
         self.all_possible_words_dict[field_coords] = (word, placement_type, anchor_coords)
 
     def place_tiles(self, ai_word):
-        self.score += ai_word.score
         for k, v in ai_word.pos_letter_dict.items():
             self.game.board.fields[k].place_tile(Tile(k))
             self.game.board.fields[k].confirm_tile()
