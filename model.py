@@ -235,7 +235,7 @@ class Game:
             # validation
             try:
                 newly_added, tiles_with_fixed_neighbours = self.validator.verify_board(self.board, self.round_no)
-                scoreCounter = score.ScoreCo
+                # scoreCounter = score.ScoreCo
                 self.active_player.score += 1
                 print(self.active_player.score)
                 self.board.fix_all()

@@ -28,6 +28,8 @@ class Validator:
         return True
 
     def __check_whether_one_word(self, board, newly_added):
+        if len(newly_added) <= 1:
+            return
         horizontal_sorted = sorted(newly_added, key=lambda x: x[1])
         vertical_sorted = sorted(newly_added, key=lambda x: x[0])
         if horizontal_sorted[0][0] == horizontal_sorted[1][0]:
@@ -54,9 +56,8 @@ class Validator:
     def __verify_check_cross(self, pos, board):
 
         # horizontal verification
-        if pos[1] - 1 >= 0 and pos[1] + 1 < config.BOARD_SIZE and \
-                board.fields[pos[0]][pos[1] + 1].state == model.FieldState.FIXED or \
-                board.fields[pos[0]][pos[1] - + 1].state == model.FieldState.FIXED:
+        if (pos[1] - 1 >= 0 and board.fields[pos[0]][pos[1] - 1].state == model.FieldState.FIXED) or \
+                (pos[1] + 1 < config.BOARD_SIZE and board.fields[pos[0]][pos[1] + 1].state == model.FieldState.FIXED):
 
             partial_word = ""
             for i in range(pos[1] - 1, -1, -1):
@@ -65,7 +66,7 @@ class Validator:
                     partial_word += curr_field.tile.character
                 else:
                     break
-
+            print("h verification1: ", partial_word)
             partial_word = partial_word[::-1]
 
             for i in range(pos[1], config.BOARD_SIZE):
@@ -74,14 +75,15 @@ class Validator:
                     partial_word += curr_field.tile.character
                 else:
                     break
-
+            print("h verification2: ", partial_word)
             if not self.check_word(partial_word):
                 raise Exception("Word ", partial_word, " associated with pos: ", pos, " does not exist!")
             else:
                 print("word ", partial_word, "exists")
 
         # vertical verification
-        else:
+        if (pos[0] - 1 >= 0 and board.fields[pos[0] - 1][pos[1]].state == model.FieldState.FIXED) or \
+                (pos[0] + 1 < config.BOARD_SIZE and board.fields[pos[0] + 1][pos[1]].state == model.FieldState.FIXED):
             partial_word = ""
             for i in range(pos[0] - 1, -1, -1):
                 curr_field = board.fields[i][pos[1]]
@@ -113,17 +115,23 @@ class Validator:
                 if field.state == model.FieldState.TEMPORARY:
                     newly_added.append((row, col))
                 col += 1
+
         if len(newly_added) == 0:
             raise Exception("You have to put tile")
+
         if not self.__check_whether_one_line(newly_added):
             print(newly_added)
             raise Exception("Tiles are not in one line!")
 
+        print("here1")
         tiles_with_fixed_neighbour = []
         for pos in newly_added:
             if self.__check_fixed_neighbour(pos, board):
                 tiles_with_fixed_neighbour.append(pos)
+
         self.__check_whether_one_word(board, newly_added)
+
+        print("here1")
         if round == 0:
             if (config.BOARD_SIZE // 2, config.BOARD_SIZE // 2) not in newly_added:
                 raise Exception("You have to start from the mid!")
@@ -141,8 +149,6 @@ class Validator:
                     word += board.fields[pos[0]][pos[1]].tile.character
             if not self.check_word(word):
                 raise Exception("Word ", word, " does not exists")
-
-
         else:
             if len(tiles_with_fixed_neighbour) == 0:
                 raise Exception("None of tiles has fixed neighbour")
