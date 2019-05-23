@@ -110,7 +110,7 @@ class DrawGameButtonsEvent(ButtonEvent):
         take_temps_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Letters', 15, (51, 255, 53), (50, 50), 110,
                                         340)
         take_all = view.Button(view.ButtonShapeType.RECTANGLE, 'Return', 15, (51, 255, 53), (50, 50), 110,
-                                        270)
+                               270)
 
         self.buttons = []
         self.buttons.append(confirm_button)
@@ -211,6 +211,12 @@ class EndGameEvent(Event):
         super().__init__()
         self.players = players
         self.name = "EndGameEvent"
+
+
+class SurrenderEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "SurrenderEvent"
 
 
 class AboutBannerShowEvent(Event):

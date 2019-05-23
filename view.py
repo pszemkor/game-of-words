@@ -166,7 +166,7 @@ class GameView:
         self.background = pygame.Surface(self.window.get_size())
         self.background.fill((0, 0, 0))
 
-        self.print_line("Game", (config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2-200), 150)
+        self.print_line("Game", (config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2 - 200), 150)
         self.print_line("of", (config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2), 150)
         self.print_line("Words", (config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2 + 200), 150)
 
@@ -268,10 +268,10 @@ class GameView:
         self.window.blit(self.background, (0, 0))
         pygame.display.flip()
 
-    def print_line(self, text, position, font_size):
+    def print_line(self, text, position, font_size, font_colour=(255,255,255)):
 
         font = pygame.font.Font(config.FONT_PATH, font_size)
-        text_img = font.render(text, 1, (255, 255, 255))
+        text_img = font.render(text, 1, font_colour)
         text_rec = text_img.get_rect(center=position)
         self.background.blit(text_img, text_rec)
         self.window.blit(self.background, (0, 0))
@@ -290,8 +290,6 @@ class GameView:
         self.print_line("2019", (config.WINDOW_WIDTH / 2, 600), 32)
         # self.print_line("\"That's what we do.", (config.WINDOW_WIDTH / 2, 450), 70)
 
-
-
     def get_field_sprite(self, field):
         for sprite in self.back_sprites:
             if hasattr(sprite, "field") and sprite.field == field:
@@ -309,11 +307,17 @@ class GameView:
 
     def game_end(self, event):
         if event.players[0].score > event.players[1].score:
-            pass
-            # todo -> YOU WIN
+            self.clean("images/win_view.jpg")
         else:
-            pass
-            # todo -> YOU LOSE
+            self.clean("images/surrender_screen.jpg")
+
+    def surrender(self):
+        print("DONE")
+        self.clean("images/surrender_screen.jpg")
+        self.print_line("You", (config.WINDOW_WIDTH / 4 - 70, 90), 70, (0,0,0))
+        self.print_line("have", (config.WINDOW_WIDTH / 2 + 200, 120), 70, (0,0,0))
+        self.print_line("been", (config.WINDOW_WIDTH / 4 - 50, 200), 70, (0, 0, 0))
+        self.print_line("DEFEATED!", (config.WINDOW_WIDTH / 2 + 230, 280), 70, (0, 0, 0))
 
     def notify(self, event):
         if isinstance(event, events.TickEvent):
@@ -343,3 +347,5 @@ class GameView:
             self.evManager.post(events.MenuBuildEvent())
         elif isinstance(event, events.EndGameEvent):
             self.game_end(event)
+        elif isinstance(event, events.SurrenderEvent):
+            self.surrender()
