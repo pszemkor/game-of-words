@@ -457,7 +457,7 @@ class Player:
         wanted_letter_amount = self.get_empty_fields_count()
         new_tiles = bag_of_letter.get_new_letters(wanted_letter_amount)
         if len(new_tiles) == 0 and wanted_letter_amount == config.TILEBOX_SIZE:
-            self.game.ev_manager.post(events.EndGameEvent, self.game.players)
+            self.game.ev_manager.post(events.EndGameEvent(self.game.players) )
 
         j = 0
         for i, field in enumerate(self.tilebox.fields):

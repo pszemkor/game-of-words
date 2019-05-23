@@ -76,13 +76,13 @@ class MenuBuildEvent(Event):
     def __init__(self):
         super().__init__()
         self.name = 'MenuBuildEvent'
-        play_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Play', 43, (51, 255, 53), (200, 80),
+        play_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Play', 43, (80, 80, 80), (200, 80),
                                   config.WINDOW_WIDTH // 2 - 100, 300)
-        set_difficulty_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Set difficulty', 21, (51, 255, 53),
+        set_difficulty_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Set difficulty', 21, (80, 80, 80),
                                             (180, 80), config.WINDOW_WIDTH // 2 - 90, 400)
-        edit_board_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Edit board', 21, (51, 255, 53), (180, 80),
+        edit_board_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Edit board', 21, (80, 80, 80), (180, 80),
                                         config.WINDOW_WIDTH // 2 - 90, 500)
-        about_button = view.Button(view.ButtonShapeType.RECTANGLE, 'About', 21, (51, 255, 53), (180, 80),
+        about_button = view.Button(view.ButtonShapeType.RECTANGLE, 'About', 21, (80, 80, 80), (180, 80),
                                    config.WINDOW_WIDTH // 2 - 90, 600)
         self.buttons = []
         self.buttons.append(play_button)
@@ -102,15 +102,16 @@ class DrawGameButtonsEvent(ButtonEvent):
     def __init__(self):
         super().__init__()
         self.name = 'DrawGameButtonsEvent'
-        confirm_button = view.Button(view.ButtonShapeType.CIRCLE, 'Confirm', 20, (51, 255, 53), (60, 60), 830, 625)
-        shuffle_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Shuffle', 20, (51, 255, 53), (50, 50), 110, 480)
-        pass_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Pass', 20, (51, 255, 53), (50, 50), 110, 550)
-        surrender_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Surrender', 15, (51, 255, 53), (50, 50), 110,
+        confirm_button = view.Button(view.ButtonShapeType.CIRCLE, 'Confirm', 20, (80,80,80), (120, 120), 830, 560)
+        shuffle_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Shuffle', 20, (80,80,80), (100, 50), 90, 480)
+        pass_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Pass', 20, (80,80,80), (100, 50), 90, 550)
+        surrender_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Surrender', 15, (80,80,80), (100, 50), 90,
                                        410)
-        take_temps_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Letters', 15, (51, 255, 53), (50, 50), 110,
+        take_temps_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Letters', 15, (80,80,80), (100, 50), 90,
                                         340)
-        take_all = view.Button(view.ButtonShapeType.RECTANGLE, 'Return', 15, (51, 255, 53), (50, 50), 110,
-                               270)
+        take_all = view.Button(view.ButtonShapeType.RECTANGLE, 'Return', 15, (80,80,80), (100, 50), 90,
+                                        270)
+
 
         self.buttons = []
         self.buttons.append(confirm_button)
