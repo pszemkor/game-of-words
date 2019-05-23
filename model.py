@@ -57,6 +57,7 @@ class Board(FieldsContainer):
         #
         # event_to_send = events.BoardBuildEvent(self)
         # self.ev_manager.post(event_to_send)
+        self.get_board_from_file()
 
     # todo -> default file -> board.txt
     def get_board_from_file(self):
@@ -65,6 +66,7 @@ class Board(FieldsContainer):
             lines = f.readlines()
             for line in lines:
                 line = line.split(", ")
+                print(line)
                 line_iter = 0
                 for field in self.fields[row]:
                     if line[line_iter].strip() == "2W":
@@ -75,6 +77,8 @@ class Board(FieldsContainer):
                         field.bonus = Bonus.BONUS_2L
                     elif line[line_iter].strip() == "3L":
                         field.bonus = Bonus.BONUS_3L
+                    line_iter += 1
+                row += 1
 
     def __str__(self):
         string = ""
@@ -279,6 +283,7 @@ class Game:
             self.active_player.pass_strike += 1
             if self.active_player.pass_strike == 2 and self.players[self.index_of_next_player()].pass_strike == 2:
                 # todo post end of game!!!!
+                print("########### END #####################")
                 pass
             else:
                 if self.round_no > 0:
@@ -482,8 +487,9 @@ class AIPlayer(Player):
         all_possible_words = self.all_possible_words_dict.items()
         # print("Found such possible words", all_possible_words)
         print("Tilebox of AI player", self.tilebox_list)
-
-        if all_possible_words is not []:
+        print(len(all_possible_words))
+        if len(all_possible_words) != 0:
+            self.pass_strike = 0
             for el in all_possible_words:
                 print('ai found', el)
                 (word, placement_type, anchor_coords) = el[1]
@@ -508,7 +514,7 @@ class AIPlayer(Player):
                         index += 1
                 break
         else:
-            pass
+            self.pass_strike += 1
             # todo -> POST PASS
 
     def __get_limit_of_left_part(self, field_position, anchors, placement_type):

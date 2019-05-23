@@ -5,10 +5,11 @@ x, x, 2W, x, x, x, 2L, x, 2L, x, x, x, 2W, x, x
 x, x, x, x, 2W, x, x, x, x, x, 2W, x, x, x, x
 x, 3L, x, x, x, 3L, x, x, x, 3L, x, x, x, 3L, x
 x, x, 2L, x, x, x, 2L, x, 2L, x, x, x, 2L, x, x
-3W, x, x, 2L, x, x, x, x, x, x, x, 2L, x, x, 3W
+3W, x, x, 2L, x, x, x, 2W, x, x, x, 2L, x, x, 3W
 x, x, 2L, x, x, x, 2L, x, 2L, x, x, x, 2L, x, x
 x, 3L, x, x, x, 3L, x, x, x, 3L, x, x, x, 3L, x
 x, x, x, x, 2W, x, x, x, x, x, 2W, x, x, x, x
 2L, x, x, 2W, x, x, x, 2L, x, x, x, 2W, x, x, 2L
+x, x, 2W, x, x, x, 2L, x, 2L, x, x, x, 2W, x, x
 x, 2W, x, x, x, 3L, x, x, x, 3L, x, x, x, 2W, x
 3W, x, x, 2L, x, x, x, 3W, x, x, x, 2L, x, x, 3W

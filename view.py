@@ -34,12 +34,23 @@ class FieldSprite(pygame.sprite.Sprite):
             self.__field_colouring()
         elif self.field.state is model.FieldState.TEMPORARY:
             self.__field_colouring()
-        # else:
-        #     font = pygame.font.Font(None, config.FIELD_RECTANGLE[0])
-        #     text = "XD"
-        #     text_img = font.render(text, 1, (0, 0, 0))
-        #     text_rec = text_img.get_rect(center=(config.FIELD_RECTANGLE[0] // 2, config.FIELD_RECTANGLE[0] // 2))
-        #     self.image.blit(text_img, text_rec)
+        else:
+            text = ""
+            font = pygame.font.Font(None, config.FIELD_RECTANGLE[0])
+            if self.field.bonus == model.Bonus.NO_BONUS:
+                return
+            elif self.field.bonus == model.Bonus.BONUS_2L:
+                text = "2L"
+            elif self.field.bonus == model.Bonus.BONUS_2W:
+                text = "2W"
+            elif self.field.bonus == model.Bonus.BONUS_3L:
+                text = "3L"
+            elif self.field.bonus == model.Bonus.BONUS_3W:
+                text = "3W"
+            text_img = font.render(text, 1, (50, 50, 50))
+            text_rec = text_img.get_rect(center=(config.FIELD_RECTANGLE[0] // 2, config.FIELD_RECTANGLE[0] // 2))
+            self.image.blit(text_img, text_rec)
+
 
 
 class ButtonSprite(pygame.sprite.Sprite):
