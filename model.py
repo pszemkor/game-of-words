@@ -285,8 +285,6 @@ class Game:
                 field.tile = tiles[i]
                 i += 1
 
-            self.ev_manager.post(events.TileBoxBuildEvent(self.active_player.tilebox))
-
         elif isinstance(event, events.SurrenderButtonPressedEvent):
             print("SURRENDER!!!!")
             self.ev_manager.post(events.SurrenderEvent())
@@ -341,6 +339,7 @@ class Game:
                 self.ev_manager.post(events.BoardBuildEvent(self.board))
                 self.ev_manager.post(events.TileBoxBuildEvent(self.active_player.tilebox))
                 self.ev_manager.post(events.ScoreBoardBuildEvent(ScoreBoard(self.players)))
+                self.ev_manager.post(events.)
                 self.round_no += 1
 
             else:
@@ -457,7 +456,7 @@ class Player:
         wanted_letter_amount = self.get_empty_fields_count()
         new_tiles = bag_of_letter.get_new_letters(wanted_letter_amount)
         if len(new_tiles) == 0 and wanted_letter_amount == config.TILEBOX_SIZE:
-            self.game.ev_manager.post(events.EndGameEvent(self.game.players) )
+            self.game.ev_manager.post(events.EndGameEvent(self.game.players))
 
         j = 0
         for i, field in enumerate(self.tilebox.fields):
@@ -550,26 +549,36 @@ class AIPlayer(Player):
         print(len(all_possible_words))
         if len(all_possible_words) != 0:
             self.pass_strike = 0
-            for el in all_possible_words:
-                print('ai found', el)
-                (word, placement_type, anchor_coords) = el[1]
-                index = 0
-                if placement_type == PlacementType.HORIZONTAL:
-                    (end_x, end_y) = el[0]
-                    i = end_y - len(word)
-                    while i < end_y:
-                        if self.game.board.fields[end_x][i].state == FieldState.EMPTY:
-                            self.game.board.fields[end_x][i].place_tile(Tile(word[index]))
-                        i += 1
-                        index += 1
-                else:
-                    (end_x, end_y) = el[0]
-                    i = end_x - len(word)
-                    while i < end_x:
-                        self.game.board.fields[i][end_y].place_tile(Tile(word[index]))
-                        i += 1
-                        index += 1
-                break
+            all_possible_words_list = [(x, self.all_possible_words_dict[x]) for x in self.all_possible_words_dict]
+            all_possible_words_list = sorted(all_possible_words_list, key=lambda x: len(x[1][0]))
+            print(all_possible_words_list)
+            if self.game.difficulty_level == DifficultyLevel.EASY:
+                el = all_possible_words_list[0]
+            elif self.game.difficulty_level == DifficultyLevel.HARD:
+                el = all_possible_words_list[-1]
+            else:
+                el = all_possible_words_list[len(all_possible_words_list) // 2]
+
+            # for el in all_possible_words:
+            print('ai found', el)
+            (word, placement_type, anchor_coords) = el[1]
+            index = 0
+            if placement_type == PlacementType.HORIZONTAL:
+                (end_x, end_y) = el[0]
+                i = end_y - len(word)
+                while i < end_y:
+                    if self.game.board.fields[end_x][i].state == FieldState.EMPTY:
+                        self.game.board.fields[end_x][i].place_tile(Tile(word[index]))
+                    i += 1
+                    index += 1
+            else:
+                (end_x, end_y) = el[0]
+                i = end_x - len(word)
+                while i < end_x:
+                    self.game.board.fields[i][end_y].place_tile(Tile(word[index]))
+                    i += 1
+                    index += 1
+                # break
             self.remove_tiles_from_tilebox()
         else:
             self.pass_strike += 1

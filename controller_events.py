@@ -58,6 +58,19 @@ class ScoreBoardBuildEvent(Event):
         self.score_board = score_board
 
 
+class TitleBuildEvent(Event):
+    def __init__(self:
+        super().__init__()
+        self.name = "TitleBuildEvent"
+
+
+class DifficultyLevelDash(Event):
+    def __init__(self, difficulty_level):
+        super().__init__()
+        self.name = "DifficultyLevelDash"
+        self.difficulty_level = difficulty_level
+
+
 class BoardBuildEvent(Event):
     def __init__(self, board):
         super().__init__()
@@ -91,6 +104,22 @@ class MenuBuildEvent(Event):
         self.buttons.append(about_button)
 
 
+class MenuDifficultyBuildEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = 'MenuDifficultyBuildEvent'
+        easy_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Easy', 21, (80, 80, 80), (180, 80),
+                                  config.WINDOW_WIDTH // 2 - 90 - 300, 350)
+        medium_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Medium', 21, (80, 80, 80),
+                                    (180, 80), config.WINDOW_WIDTH // 2 - 90, 350)
+        hard_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Hard', 21, (80, 80, 80), (180, 80),
+                                  config.WINDOW_WIDTH // 2 - 90 + 300, 350)
+        self.buttons = []
+        self.buttons.append(easy_button)
+        self.buttons.append(medium_button)
+        self.buttons.append(hard_button)
+
+
 # superior event for buttons
 class ButtonEvent(Event):
     def __init__(self):
@@ -102,16 +131,15 @@ class DrawGameButtonsEvent(ButtonEvent):
     def __init__(self):
         super().__init__()
         self.name = 'DrawGameButtonsEvent'
-        confirm_button = view.Button(view.ButtonShapeType.CIRCLE, 'Confirm', 20, (80,80,80), (120, 120), 830, 560)
-        shuffle_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Shuffle', 20, (80,80,80), (100, 50), 90, 480)
-        pass_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Pass', 20, (80,80,80), (100, 50), 90, 550)
-        surrender_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Surrender', 15, (80,80,80), (100, 50), 90,
+        confirm_button = view.Button(view.ButtonShapeType.CIRCLE, 'Confirm', 20, (80, 80, 80), (120, 120), 830, 560)
+        shuffle_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Shuffle', 20, (80, 80, 80), (100, 50), 90, 480)
+        pass_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Pass', 20, (80, 80, 80), (100, 50), 90, 550)
+        surrender_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Surrender', 15, (80, 80, 80), (100, 50), 90,
                                        410)
-        take_temps_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Letters', 15, (80,80,80), (100, 50), 90,
+        take_temps_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Letters', 15, (80, 80, 80), (100, 50), 90,
                                         340)
-        take_all = view.Button(view.ButtonShapeType.RECTANGLE, 'Return', 15, (80,80,80), (100, 50), 90,
-                                        270)
-
+        take_all = view.Button(view.ButtonShapeType.RECTANGLE, 'Return', 15, (80, 80, 80), (100, 50), 90,
+                               270)
 
         self.buttons = []
         self.buttons.append(confirm_button)

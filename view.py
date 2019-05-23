@@ -164,16 +164,18 @@ class GameView:
         self.window = pygame.display.set_mode((config.WINDOW_WIDTH, config.WINDOW_HEIGHT))
         pygame.display.set_caption('Game of Words')
         self.background = pygame.Surface(self.window.get_size())
-        self.background.fill((0, 0, 0))
+        # self.background.fill((0, 0, 0))
 
-        self.print_line("Game", (config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2 - 200), 150)
-        self.print_line("of", (config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2), 150)
-        self.print_line("Words", (config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2 + 200), 150)
+        self.clean('images/main_background.jpg')
+
+        self.print_line("Game", (config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2 - 200), 150, (0, 0, 0))
+        self.print_line("of", (config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2), 150, (0, 0, 0))
+        self.print_line("Words", (config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2 + 200), 150, (0, 0, 0))
 
         self.back_sprites = pygame.sprite.RenderUpdates()
         self.front_sprites = pygame.sprite.RenderUpdates()
 
-        # pygame.time.delay(2000)
+        pygame.time.delay(1000)
         # pygame.time.delay(200)
 
     def show_board(self, board):
@@ -257,18 +259,12 @@ class GameView:
         pygame.display.flip()
 
     def show_other_player_move_banner(self, player):
-        self.background = pygame.Surface(self.window.get_size())
-        self.background.fill((0, 0, 0))
-        font = pygame.font.Font(config.FONT_PATH, 150)
-        # text = "Brace yourself for\n" + player.get_name() + "\nmove!"
-        text = "Brace yourself!"
-        text_img = font.render(text, 1, (255, 255, 255))
-        text_rec = text_img.get_rect(center=(config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2))
-        self.background.blit(text_img, text_rec)
-        self.window.blit(self.background, (0, 0))
-        pygame.display.flip()
+        self.clean('images/background.jpg')
+        self.print_line("Brace", (config.WINDOW_WIDTH // 2 - 300, 200), 100, (0, 0, 0))
+        self.print_line("yourself!", (config.WINDOW_WIDTH // 2 - 200, 350), 100, (0, 0, 0))
+        pygame.time.delay(1000)
 
-    def print_line(self, text, position, font_size, font_colour=(255,255,255)):
+    def print_line(self, text, position, font_size, font_colour=(255, 255, 255)):
 
         font = pygame.font.Font(config.FONT_PATH, font_size)
         text_img = font.render(text, 1, font_colour)
@@ -278,17 +274,15 @@ class GameView:
         pygame.display.flip()
 
     def show_about_banner(self):
-        self.background = pygame.Surface(self.window.get_size())
-        self.background.fill((0, 0, 0))
-        self.print_line("About", (config.WINDOW_WIDTH / 2, 100), 100)
-        self.print_line("\"That's what we do.", (config.WINDOW_WIDTH / 2, 250), 50)
-        self.print_line("We  code  and  we  know  things.\"", (config.WINDOW_WIDTH / 2, 320), 50)
+        self.clean('images/main_background.jpg')
+        self.print_line("About", (config.WINDOW_WIDTH / 2, 100), 100, (0, 0, 0))
+        self.print_line("\"That's what we do.", (config.WINDOW_WIDTH / 2, 250), 50, (0, 0, 0))
+        self.print_line("We  code  and  we  know  things.\"", (config.WINDOW_WIDTH / 2, 320), 50, (0, 0, 0))
 
-        self.print_line("Created by", (config.WINDOW_WIDTH / 2, 450), 25)
-        self.print_line("PRZEMYSLAW  JABLECKI", (config.WINDOW_WIDTH / 2, 480), 28)
-        self.print_line("FILIP  SLAZYK", (config.WINDOW_WIDTH / 2, 510), 28)
-        self.print_line("2019", (config.WINDOW_WIDTH / 2, 600), 32)
-        # self.print_line("\"That's what we do.", (config.WINDOW_WIDTH / 2, 450), 70)
+        self.print_line("Created by", (config.WINDOW_WIDTH / 2, 450), 25, (0, 0, 0))
+        self.print_line("PRZEMYSLAW  JABLECKI", (config.WINDOW_WIDTH / 2, 480), 28, (0, 0, 0))
+        self.print_line("FILIP  SLAZYK", (config.WINDOW_WIDTH / 2, 510), 28, (0, 0, 0))
+        self.print_line("2019", (config.WINDOW_WIDTH / 2, 600), 32, (0, 0, 0))
 
     def get_field_sprite(self, field):
         for sprite in self.back_sprites:
@@ -302,7 +296,13 @@ class GameView:
         new_score_board_sprite.rect = score_board_rect
 
     def build_menu_event(self, buttons):
-        self.clean()
+        self.clean('images/main_background.jpg')
+        self.print_line('Game of Words', (config.WINDOW_WIDTH / 2, 180), 100, (0, 0, 0))
+        self.show_buttons(buttons)
+
+    def build_difficulty_menu_event(self, buttons):
+        self.clean('images/main_background.jpg')
+        self.print_line('Select level of difficulty', (config.WINDOW_WIDTH / 2, 180), 50, (0, 0, 0))
         self.show_buttons(buttons)
 
     def game_end(self, event):
@@ -321,11 +321,10 @@ class GameView:
     def surrender(self):
         print("DONE")
         self.clean("images/surrender_screen.jpg")
-        self.print_line("You", (config.WINDOW_WIDTH / 4 - 70, 90), 70, (0,0,0))
-        self.print_line("have", (config.WINDOW_WIDTH / 2 + 200, 120), 70, (0,0,0))
+        self.print_line("You", (config.WINDOW_WIDTH / 4 - 70, 90), 70, (0, 0, 0))
+        self.print_line("have", (config.WINDOW_WIDTH / 2 + 200, 120), 70, (0, 0, 0))
         self.print_line("been", (config.WINDOW_WIDTH / 4 - 50, 200), 70, (0, 0, 0))
         self.print_line("DEFEATED!", (config.WINDOW_WIDTH / 2 + 230, 280), 70, (0, 0, 0))
-
 
     def notify(self, event):
         if isinstance(event, events.TickEvent):
@@ -339,7 +338,6 @@ class GameView:
         elif isinstance(event, events.DrawGameButtonsEvent):
             self.show_buttons(event.buttons)
         elif isinstance(event, events.OtherPlayerTurnEvent):
-            # self.clean()
             self.show_other_player_move_banner(event.player)
         elif isinstance(event, events.ScoreBoardBuildEvent):
             self.show_score_board(event.score_board)
@@ -357,3 +355,5 @@ class GameView:
             self.game_end(event)
         elif isinstance(event, events.SurrenderEvent):
             self.surrender()
+        elif isinstance(event, events.MenuDifficultyBuildEvent):
+            self.build_difficulty_menu_event(event.buttons)

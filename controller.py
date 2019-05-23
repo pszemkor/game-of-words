@@ -75,38 +75,42 @@ class MouseEventHandler:
         self.game = game
 
     def get_event_from_clicked_sprites(self, sprites):
-        if self.event_manager.screen_state == ScreenState.GAME:
-            sprite = sprites[0]
-            if hasattr(sprite, 'field') and In2dArray(self.game.board.fields, sprite.field):
-                ev_to_send = events.SelectFieldEvent(sprite.field, model.FieldGroup.BOARD)
-                return ev_to_send
-            elif hasattr(sprite, 'field') and sprite.field in self.game.active_player.tilebox.fields:
-                ev_to_send = events.SelectFieldEvent(sprite.field, model.FieldGroup.TILEBOX)
-                return ev_to_send
-            elif hasattr(sprite, 'button') and sprite.button.text == 'Confirm':
-                ev_to_send = events.ConfirmButtonPressedEvent()
-                return ev_to_send
-            elif hasattr(sprite, 'button') and sprite.button.text == 'Pass':
-                ev_to_send = events.PassButtonPressedEvent()
-                return ev_to_send
-            elif hasattr(sprite, 'button') and sprite.button.text == 'Shuffle':
-                ev_to_send = events.ShuffleButtonPressedEvent()
-                return ev_to_send
-            elif hasattr(sprite, 'button') and sprite.button.text == 'Letters':
-                ev_to_send = events.NewLettersButtonPressedEvent()
-                return ev_to_send
-            elif hasattr(sprite, 'button') and sprite.button.text == 'Return':
-                ev_to_send = events.TakeAllButtonEvent()
-                return ev_to_send
-            elif hasattr(sprite, 'button') and sprite.button.text == 'Surrender':
-                ev_to_send = events.SurrenderButtonPressedEvent()
-                return ev_to_send
-            elif hasattr(sprite, 'button') and sprite.button.text == 'Play':
-                ev_to_send = events.NextPlayerMoveStartedEvent(self.game)
-                return ev_to_send
-            elif hasattr(sprite, 'button') and sprite.button.text == 'About':
-                ev_to_send = events.AboutBannerShowEvent()
-                return ev_to_send
+        ev_to_send = None
+        sprite = sprites[0]
+        if hasattr(sprite, 'field') and In2dArray(self.game.board.fields, sprite.field):
+            ev_to_send = events.SelectFieldEvent(sprite.field, model.FieldGroup.BOARD)
+        elif hasattr(sprite, 'field') and sprite.field in self.game.active_player.tilebox.fields:
+            ev_to_send = events.SelectFieldEvent(sprite.field, model.FieldGroup.TILEBOX)
+        elif hasattr(sprite, 'button') and sprite.button.text == 'Confirm':
+            ev_to_send = events.ConfirmButtonPressedEvent()
+        elif hasattr(sprite, 'button') and sprite.button.text == 'Pass':
+            ev_to_send = events.PassButtonPressedEvent()
+        elif hasattr(sprite, 'button') and sprite.button.text == 'Shuffle':
+            ev_to_send = events.ShuffleButtonPressedEvent()
+        elif hasattr(sprite, 'button') and sprite.button.text == 'Letters':
+            ev_to_send = events.NewLettersButtonPressedEvent()
+        elif hasattr(sprite, 'button') and sprite.button.text == 'Return':
+            ev_to_send = events.TakeAllButtonEvent()
+        elif hasattr(sprite, 'button') and sprite.button.text == 'Surrender':
+            ev_to_send = events.SurrenderButtonPressedEvent()
+        elif hasattr(sprite, 'button') and sprite.button.text == 'Play':
+            ev_to_send = events.NextPlayerMoveStartedEvent(self.game)
+        elif hasattr(sprite, 'button') and sprite.button.text == 'About':
+            ev_to_send = events.AboutBannerShowEvent()
+        elif hasattr(sprite, 'button') and sprite.button.text == 'Set difficulty':
+            ev_to_send = events.MenuDifficultyBuildEvent()
+        elif hasattr(sprite, 'button') and sprite.button.text == 'Easy':
+            self.game.difficulty_level = model.DifficultyLevel.EASY
+            ev_to_send = events.MenuBuildEvent()
+        elif hasattr(sprite, 'button') and sprite.button.text == 'Medium':
+            self.game.difficulty_level = model.DifficultyLevel.MEDIUM
+            ev_to_send = events.MenuBuildEvent()
+        elif hasattr(sprite, 'button') and sprite.button.text == 'Hard':
+            self.game.difficulty_level = model.DifficultyLevel.HARD
+            ev_to_send = events.MenuBuildEvent()
+
+        return ev_to_send
+
 
 class MouseController:
     def __init__(self, event_manager, view_, game):
