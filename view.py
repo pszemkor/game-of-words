@@ -264,6 +264,30 @@ class GameView:
         self.window.blit(self.background, (0, 0))
         pygame.display.flip()
 
+    def print_line(self, text, position, font_size):
+
+        font = pygame.font.Font(config.FONT_PATH, font_size)
+        text_img = font.render(text, 1, (255, 255, 255))
+        text_rec = text_img.get_rect(center=position)
+        self.background.blit(text_img, text_rec)
+        self.window.blit(self.background, (0, 0))
+        pygame.display.flip()
+
+    def show_about_banner(self):
+        self.background = pygame.Surface(self.window.get_size())
+        self.background.fill((0, 0, 0))
+        self.print_line("About", (config.WINDOW_WIDTH / 2, 100), 100)
+        self.print_line("\"That's what we do.", (config.WINDOW_WIDTH / 2, 250), 50)
+        self.print_line("We  code  and  we  know  things.\"", (config.WINDOW_WIDTH / 2, 320), 50)
+
+        self.print_line("Created by", (config.WINDOW_WIDTH / 2, 450), 25)
+        self.print_line("PRZEMYSLAW  JABLECKI", (config.WINDOW_WIDTH / 2, 480), 28)
+        self.print_line("FILIP  SLAZYK", (config.WINDOW_WIDTH / 2, 510), 28)
+        self.print_line("2019", (config.WINDOW_WIDTH / 2, 600), 32)
+        # self.print_line("\"That's what we do.", (config.WINDOW_WIDTH / 2, 450), 70)
+
+
+
     def get_field_sprite(self, field):
         for sprite in self.back_sprites:
             if hasattr(sprite, "field") and sprite.field == field:
@@ -291,7 +315,7 @@ class GameView:
         elif isinstance(event, events.DrawGameButtonsEvent):
             self.show_buttons(event.buttons)
         elif isinstance(event, events.OtherPlayerTurnEvent):
-            self.clean()
+            # self.clean()
             self.show_other_player_move_banner(event.player)
         elif isinstance(event, events.ScoreBoardBuildEvent):
             self.show_score_board(event.score_board)
@@ -299,3 +323,9 @@ class GameView:
             self.build_menu_event(event.buttons)
         elif isinstance(event, events.ClearScreenEvent):
             self.clean()
+        elif isinstance(event, events.AboutBannerShowEvent):
+            self.clean()
+            self.show_about_banner()
+            pygame.time.wait(5000)
+            self.clean()
+            self.evManager.post(events.MenuBuildEvent())
