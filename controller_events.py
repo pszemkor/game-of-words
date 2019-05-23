@@ -194,14 +194,15 @@ class OtherPlayerTurnEvent(Event):
         self.name = "OtherPlayerTurnEvent"
 
 
-class OtherPlayerTurnEvent(Event):
-    def __init__(self, player):
+class EndGameEvent(Event):
+    def __init__(self, players):
         super().__init__()
-        self.player = player
-        self.name = "OtherPlayerTurnEvent"
+        self.players = players
+        self.name = "EndGameEvent"
 
 
 class AboutBannerShowEvent(Event):
     def __init__(self):
         super().__init__()
         self.name = "AboutBannerShowEvent"
+

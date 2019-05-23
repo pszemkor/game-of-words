@@ -303,6 +303,14 @@ class GameView:
         self.clean()
         self.show_buttons(buttons)
 
+    def game_end(self, event):
+        if event.players[0].score > event.players[1].score:
+            pass
+            # todo -> YOU WIN
+        else:
+            pass
+            # todo -> YOU LOSE
+
     def notify(self, event):
         if isinstance(event, events.TickEvent):
             self.draw_everything()
@@ -329,3 +337,5 @@ class GameView:
             pygame.time.wait(5000)
             self.clean()
             self.evManager.post(events.MenuBuildEvent())
+        elif isinstance(event, events.EndGameEvent):
+            self.game_end(event)

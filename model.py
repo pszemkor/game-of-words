@@ -16,7 +16,6 @@ import score as SC
 import view
 
 
-
 # todo -> algo do "AI"
 # todo ->
 
@@ -242,7 +241,7 @@ class Game:
             # validation
             try:
                 newly_added, tiles_with_fixed_neighbours = self.validator.verify_board(self.board, self.round_no)
-                #todo -> score
+                # todo -> score
                 score_counter = SC.ScoreCounter(self.board)
                 print("PLAYER SCORE: (pre) ", self.active_player.score)
                 self.active_player.score += score_counter.count_score()
@@ -281,17 +280,20 @@ class Game:
         elif isinstance(event, events.FactButtonPressedEvent):
             pass
         elif isinstance(event, events.PassButtonPressedEvent):
-            self.active_player.pass_strike += 1
-            if self.active_player.pass_strike == 2 and self.players[self.index_of_next_player()].pass_strike == 2:
-                # todo post end of game!!!!
-                print("########### END #####################")
+            if self.round_no > 0:
+                print("PASS STRIKES", self.active_player.pass_strike,
+                      self.players[self.index_of_next_player()].pass_strike)
+            if self.active_player.pass_strike >= 2 and self.players[self.index_of_next_player()].pass_strike >= 2:
+                self.ev_manager.post(events.EndGameEvent(self.players))
                 pass
             else:
                 if self.round_no > 0:
                     self.set_active_player(self.players[self.index_of_next_player()])
                     self.ev_manager.post(events.NextPlayerMoveStartedEvent(self))
+                    self.active_player.pass_strike += 1
                 else:
                     print("CANNOT USE PASS BUTTON DURING FIRST ROUND!")
+
 
 
 
@@ -309,7 +311,6 @@ class Game:
                     # todo end game
                     print(str(e))
                     pass
-
 
                 self.ev_manager.post(events.DrawGameButtonsEvent())
                 self.ev_manager.post(events.BoardBuildEvent(self.board))
@@ -431,7 +432,7 @@ class Player:
         wanted_letter_amount = self.get_empty_fields_count()
         new_tiles = bag_of_letter.get_new_letters(wanted_letter_amount)
         if len(new_tiles) == 0 and wanted_letter_amount == config.TILEBOX_SIZE:
-            raise Exception("END OF GAME")
+            self.game.ev_manager.post(events.EndGameEvent, self.game.players)
 
         j = 0
         for i, field in enumerate(self.tilebox.fields):
@@ -483,13 +484,26 @@ class AIPlayer(Player):
         self.all_possible_words_dict = {}
         self.score = 0
 
-    def remove_tile(self, word, x, y, index):
-        if self.game.board.fields[x][y].state == FieldState.EMPTY:
+    def remove_one_tile_from_tilebox(self, letter):
+        found = False
+        for field in self.tilebox.fields:
+            if field.state == FieldState.TEMPORARY and field.tile.character == letter:
+                field.tile = None
+                field.state = FieldState.EMPTY
+                found = True
+        if not found:
             for field in self.tilebox.fields:
-                if field.state != FieldState.EMPTY and field.tile.character == word[index]:
-                    field.state = FieldState.EMPTY
+                if field.state == FieldState.TEMPORARY and field.tile.character == "?":
                     field.tile = None
-        pass
+                    field.state = FieldState.EMPTY
+
+    def remove_tiles_from_tilebox(self):
+        for i in range(config.BOARD_SIZE):
+            for j in range(config.BOARD_SIZE):
+                curr_field = self.game.board.fields[i][j]
+                if curr_field.state == FieldState.TEMPORARY:
+                    if curr_field.tile.character in self.tilebox_list:
+                        self.remove_one_tile_from_tilebox(curr_field.tile.character)
 
     def make_turn(self):
         self.__get_tilebox_list()
@@ -508,25 +522,21 @@ class AIPlayer(Player):
                     (end_x, end_y) = el[0]
                     i = end_y - len(word)
                     while i < end_y:
-                        self.remove_tile(word, end_x, i, index)
                         if self.game.board.fields[end_x][i].state == FieldState.EMPTY:
                             self.game.board.fields[end_x][i].place_tile(Tile(word[index]))
-                        # self.game.board.fields[end_x][i].confirm_tile()
                         i += 1
                         index += 1
                 else:
                     (end_x, end_y) = el[0]
                     i = end_x - len(word)
                     while i < end_x:
-                        self.remove_tile(word, i, end_y, index)
                         self.game.board.fields[i][end_y].place_tile(Tile(word[index]))
-                        # self.game.board.fields[i][end_y].confirm_tile()
                         i += 1
                         index += 1
                 break
+            self.remove_tiles_from_tilebox()
         else:
             self.pass_strike += 1
-            # todo -> POST PASS
 
     def __get_limit_of_left_part(self, field_position, anchors, placement_type):
         current_position = (field_position[0], field_position[1])
