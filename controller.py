@@ -98,6 +98,9 @@ class MouseEventHandler:
             elif hasattr(sprite, 'button') and sprite.button.text == 'Surrender':
                 ev_to_send = events.SurrenderButtonPressedEvent()
                 return ev_to_send
+            elif hasattr(sprite, 'button') and sprite.button.text == 'Play':
+                ev_to_send = events.NextPlayerMoveStartedEvent(self.game)
+                return ev_to_send
 
 
 class MouseController:
