@@ -335,11 +335,13 @@ class Game:
                 self.active_player.refill_tilebox()
                 print("refiled")
 
+
+                self.ev_manager.post(events.TitleBuildEvent())
+                self.ev_manager.post(events.DifficultyLevelDash(self.difficulty_level))
                 self.ev_manager.post(events.DrawGameButtonsEvent())
                 self.ev_manager.post(events.BoardBuildEvent(self.board))
                 self.ev_manager.post(events.TileBoxBuildEvent(self.active_player.tilebox))
                 self.ev_manager.post(events.ScoreBoardBuildEvent(ScoreBoard(self.players)))
-                self.ev_manager.post(events.)
                 self.round_no += 1
 
             else:

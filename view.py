@@ -23,16 +23,24 @@ class FieldSprite(pygame.sprite.Sprite):
         text_rec = text_img.get_rect(center=(config.FIELD_RECTANGLE[0] // 2, config.FIELD_RECTANGLE[0] // 2))
         self.image.blit(text_img, text_rec)
 
+        font = pygame.font.Font(config.FONT_PATH, 9)
+        text = str(self.field.tile.get_value())
+        text_img = font.render(text, 1, (0, 0, 0))
+        text_rec = text_img.get_rect(center=(config.FIELD_RECTANGLE[0] // 2 + 13, config.FIELD_RECTANGLE[0] // 2 + 13))
+        self.image.blit(text_img, text_rec)
+
     def update(self):
         if self.field.is_active:
-            self.image.fill((255, 255, 0))
+            self.image.fill((255, 0, 208))
         else:
-            self.image.fill((50, 205, 50))
+            self.image.fill((158, 168, 186))
 
         if self.field.state is model.FieldState.FIXED:
-            self.image.fill((200, 50, 0))
+            self.image.fill((112, 165, 120))
             self.__field_colouring()
         elif self.field.state is model.FieldState.TEMPORARY:
+            if not self.field.is_active:
+                self.image.fill((88, 226, 109))
             self.__field_colouring()
         else:
             text = ""
@@ -40,14 +48,22 @@ class FieldSprite(pygame.sprite.Sprite):
             if self.field.bonus == model.Bonus.NO_BONUS:
                 return
             elif self.field.bonus == model.Bonus.BONUS_2L:
+                if not self.field.is_active:
+                    self.image.fill((249, 240, 152))
                 text = "2L"
             elif self.field.bonus == model.Bonus.BONUS_2W:
+                if not self.field.is_active:
+                    self.image.fill((242, 167, 82))
                 text = "2W"
             elif self.field.bonus == model.Bonus.BONUS_3L:
+                if not self.field.is_active:
+                    self.image.fill((249, 237, 112))
                 text = "3L"
             elif self.field.bonus == model.Bonus.BONUS_3W:
+                if not self.field.is_active:
+                    self.image.fill((221, 112, 48))
                 text = "3W"
-            text_img = font.render(text, 1, (50, 50, 50))
+            text_img = font.render(text, 1, (140, 140, 140))
             text_rec = text_img.get_rect(center=(config.FIELD_RECTANGLE[0] // 2, config.FIELD_RECTANGLE[0] // 2))
             self.image.blit(text_img, text_rec)
 
@@ -121,6 +137,38 @@ class ScoreBoardSprite(pygame.sprite.Sprite):
         score_text = self.players[1].name + " : " + str(self.players[1].score)
         text_img = font.render(score_text, 1, (250, 250, 250))
         text_rec = text_img.get_rect(center=(self.shape[0] // 2 - 20, 2 * self.shape[1] // 3 + 10))
+        self.image.blit(text_img, text_rec)
+
+    def update(self, *args):
+        self.image.fill((80, 80, 80))
+        self.__blit()
+
+
+class DifficultyDashSprite(pygame.sprite.Sprite):
+    def __init__(self, difficulty_level, group=None):
+        pygame.sprite.Sprite.__init__(self, group)
+        self.shape = config.DIFFICULTY_DASH_SHAPE
+        self.image = pygame.Surface(self.shape)
+        self.difficulty_level = difficulty_level
+        self.update()
+
+    def __blit(self):
+        font = pygame.font.Font(config.FONT_PATH, 20)
+        score_text = "Difficulty level"
+        text_img = font.render(score_text, 1, (250, 250, 250))
+        text_rec = text_img.get_rect(center=(self.shape[0] // 2, self.shape[1] // 5))
+        self.image.blit(text_img, text_rec)
+
+        font = pygame.font.Font(config.FONT_PATH, 30)
+        if self.difficulty_level == model.DifficultyLevel.EASY:
+            text = "EASY"
+        elif self.difficulty_level == model.DifficultyLevel.MEDIUM:
+            text = "MEDIUM"
+        else:
+            text = "HARD"
+
+        text_img = font.render(text, 1, (250, 250, 250))
+        text_rec = text_img.get_rect(center=(self.shape[0] // 2 - 5, self.shape[1] // 2 +10))
         self.image.blit(text_img, text_rec)
 
     def update(self, *args):
@@ -295,6 +343,15 @@ class GameView:
         new_score_board_sprite = ScoreBoardSprite(score_board, self.front_sprites)
         new_score_board_sprite.rect = score_board_rect
 
+    def show_title(self):
+        self.print_line('Game of Words', (config.WINDOW_WIDTH / 2, 60), 50, (0, 0, 0))
+
+    def show_difficulty_dash(self, difficulty_level):
+        dash_rect = pygame.Rect(config.LEFT_EDGE_DIFFICULTY_DASH_OFFSET, config.TOP_EDGE_DIFFICULTY_DASH_OFFSET,
+                                *config.DIFFICULTY_DASH_SHAPE)
+        new_score_board_sprite = DifficultyDashSprite(difficulty_level, self.front_sprites)
+        new_score_board_sprite.rect = dash_rect
+
     def build_menu_event(self, buttons):
         self.clean('images/main_background.jpg')
         self.print_line('Game of Words', (config.WINDOW_WIDTH / 2, 180), 100, (0, 0, 0))
@@ -357,3 +414,7 @@ class GameView:
             self.surrender()
         elif isinstance(event, events.MenuDifficultyBuildEvent):
             self.build_difficulty_menu_event(event.buttons)
+        elif isinstance(event, events.DifficultyLevelDash):
+            self.show_difficulty_dash(event.difficulty_level)
+        elif isinstance(event, events.TitleBuildEvent):
+            self.show_title()
