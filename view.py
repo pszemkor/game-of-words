@@ -17,7 +17,7 @@ class FieldSprite(pygame.sprite.Sprite):
         self.update()
 
     def __field_colouring(self):
-        font = pygame.font.Font(config.FONT_PATH, config.FIELD_RECTANGLE[0]-10)
+        font = pygame.font.Font(config.FONT_PATH, config.FIELD_RECTANGLE[0] - 10)
         text = self.field.tile.__str__()
         text_img = font.render(text, 1, (0, 0, 0))
         text_rec = text_img.get_rect(center=(config.FIELD_RECTANGLE[0] // 2, config.FIELD_RECTANGLE[0] // 2))
@@ -36,7 +36,7 @@ class FieldSprite(pygame.sprite.Sprite):
             self.__field_colouring()
         else:
             text = ""
-            font = pygame.font.Font(config.FONT_PATH, config.FIELD_RECTANGLE[0]-15)
+            font = pygame.font.Font(config.FONT_PATH, config.FIELD_RECTANGLE[0] - 15)
             if self.field.bonus == model.Bonus.NO_BONUS:
                 return
             elif self.field.bonus == model.Bonus.BONUS_2L:
@@ -105,16 +105,22 @@ class ScoreBoardSprite(pygame.sprite.Sprite):
         self.update()
 
     def __blit(self):
-        font = pygame.font.Font(config.FONT_PATH, 10)
-        score_text = self.players[0].name + " : " + str(self.players[0].score)
+        font = pygame.font.Font(config.FONT_PATH, 25)
+        score_text = "SCOREBOARD"
         text_img = font.render(score_text, 1, (250, 250, 250))
-        text_rec = text_img.get_rect(center=(self.shape[0] // 2, self.shape[1] // 3))
+        text_rec = text_img.get_rect(center=(self.shape[0] // 2, self.shape[1] // 6))
         self.image.blit(text_img, text_rec)
 
-        font = pygame.font.Font(config.FONT_PATH, 10)
+        font = pygame.font.Font(config.FONT_PATH, 20)
+        score_text = self.players[0].name + " : " + str(self.players[0].score)
+        text_img = font.render(score_text, 1, (250, 250, 250))
+        text_rec = text_img.get_rect(center=(self.shape[0] // 2 - 20, self.shape[1] // 2 - 10))
+        self.image.blit(text_img, text_rec)
+
+        font = pygame.font.Font(config.FONT_PATH, 20)
         score_text = self.players[1].name + " : " + str(self.players[1].score)
         text_img = font.render(score_text, 1, (250, 250, 250))
-        text_rec = text_img.get_rect(center=(self.shape[0] // 2, 2 * self.shape[1] // 3))
+        text_rec = text_img.get_rect(center=(self.shape[0] // 2 - 20, 2 * self.shape[1] // 3 + 10))
         self.image.blit(text_img, text_rec)
 
     def update(self, *args):
@@ -269,6 +275,10 @@ class GameView:
         new_score_board_sprite = ScoreBoardSprite(score_board, self.front_sprites)
         new_score_board_sprite.rect = score_board_rect
 
+    def build_menu_event(self, buttons):
+        self.clean()
+        self.show_buttons(buttons)
+
     def notify(self, event):
         if isinstance(event, events.TickEvent):
             self.draw_everything()
@@ -285,3 +295,7 @@ class GameView:
             self.show_other_player_move_banner(event.player)
         elif isinstance(event, events.ScoreBoardBuildEvent):
             self.show_score_board(event.score_board)
+        elif isinstance(event, events.MenuBuildEvent):
+            self.build_menu_event(event.buttons)
+        elif isinstance(event, events.ClearScreenEvent):
+            self.clean()

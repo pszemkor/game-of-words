@@ -25,7 +25,8 @@ def main():
     cpu_player.set_name("AI Player")
     game.players.append(cpu_player)
     game.main_player = game.players[0]
-    ev_manager.post(events.NextPlayerMoveStartedEvent(game))
+
+    ev_manager.post(events.MenuBuildEvent())
 
     # init_letters_player = game.bags_of_letters.get_new_letters(config.TILEBOX_SIZE)
     # i = 0
