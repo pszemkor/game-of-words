@@ -17,7 +17,7 @@ class FieldSprite(pygame.sprite.Sprite):
         self.update()
 
     def __field_colouring(self):
-        font = pygame.font.Font(None, config.FIELD_RECTANGLE[0])
+        font = pygame.font.Font(config.FONT_PATH, config.FIELD_RECTANGLE[0]-10)
         text = self.field.tile.__str__()
         text_img = font.render(text, 1, (0, 0, 0))
         text_rec = text_img.get_rect(center=(config.FIELD_RECTANGLE[0] // 2, config.FIELD_RECTANGLE[0] // 2))
@@ -36,7 +36,7 @@ class FieldSprite(pygame.sprite.Sprite):
             self.__field_colouring()
         else:
             text = ""
-            font = pygame.font.Font(None, config.FIELD_RECTANGLE[0])
+            font = pygame.font.Font(config.FONT_PATH, config.FIELD_RECTANGLE[0]-15)
             if self.field.bonus == model.Bonus.NO_BONUS:
                 return
             elif self.field.bonus == model.Bonus.BONUS_2L:
@@ -61,7 +61,7 @@ class ButtonSprite(pygame.sprite.Sprite):
 
     # DRY util
     def __blit(self):
-        font = pygame.font.Font(None, self.button.font_size)
+        font = pygame.font.Font(config.FONT_PATH, self.button.font_size)
         text_img = font.render(self.button.text, 1, (255, 255, 255))
         text_rec = text_img.get_rect(center=(self.button.shape[0] // 2, self.button.shape[1] // 2))
         self.image.blit(text_img, text_rec)
@@ -86,7 +86,7 @@ class BannerSprite(pygame.sprite.Sprite):
 
     # DRY util
     def __blit(self):
-        font = pygame.font.Font(None, self.banner.font_size)
+        font = pygame.font.Font(config.FONT_PATH, self.banner.font_size)
         text_img = font.render(self.banner.text, 1, (255, 255, 255))
         text_rec = text_img.get_rect(center=(self.banner.shape[0] // 2, self.button.shape[1] // 2))
         self.image.blit(text_img, text_rec)
@@ -105,19 +105,17 @@ class ScoreBoardSprite(pygame.sprite.Sprite):
         self.update()
 
     def __blit(self):
-        font = pygame.font.Font(None, 15)
-        score_text = "Player 1: " + str(self.players[0].score) + " Player 2: " + str(self.players[1].score)
+        font = pygame.font.Font(config.FONT_PATH, 10)
+        score_text = self.players[0].name + " : " + str(self.players[0].score)
         text_img = font.render(score_text, 1, (250, 250, 250))
-        text_rec = text_img.get_rect(center=(self.shape[0] // 3, self.shape[1] // 3))
+        text_rec = text_img.get_rect(center=(self.shape[0] // 2, self.shape[1] // 3))
         self.image.blit(text_img, text_rec)
 
-        font = pygame.font.Font(None, 15)
-        score_text = "Player 1: " + str(self.players[0].score) + " Player 2: " + str(self.players[1].score)
+        font = pygame.font.Font(config.FONT_PATH, 10)
+        score_text = self.players[1].name + " : " + str(self.players[1].score)
         text_img = font.render(score_text, 1, (250, 250, 250))
-        text_rec = text_img.get_rect(center=(2*self.shape[0] // 3, 2*self.shape[1] // 3))
+        text_rec = text_img.get_rect(center=(self.shape[0] // 2, 2 * self.shape[1] // 3))
         self.image.blit(text_img, text_rec)
-
-
 
     def update(self, *args):
         self.image.fill((80, 80, 80))
@@ -161,7 +159,7 @@ class GameView:
         pygame.display.set_caption('Game of Words')
         self.background = pygame.Surface(self.window.get_size())
         self.background.fill((0, 0, 0))
-        font = pygame.font.Font(None, 150)
+        font = pygame.font.Font(config.FONT_PATH, 150)
         text = "Game of Words"
         text_img = font.render(text, 1, (255, 255, 255))
         text_rec = text_img.get_rect(center=(config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2))
@@ -251,7 +249,7 @@ class GameView:
     def show_other_player_move_banner(self, player):
         self.background = pygame.Surface(self.window.get_size())
         self.background.fill((0, 0, 0))
-        font = pygame.font.Font(None, 150)
+        font = pygame.font.Font(config.FONT_PATH, 150)
         # text = "Brace yourself for\n" + player.get_name() + "\nmove!"
         text = "Brace yourself!"
         text_img = font.render(text, 1, (255, 255, 255))

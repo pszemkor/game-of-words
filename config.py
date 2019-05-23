@@ -1,3 +1,4 @@
+FONT_PATH = "./font/GameofThrones.ttf"
 BOARD_SIZE = 15
 TILEBOX_SIZE = 7
 

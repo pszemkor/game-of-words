@@ -412,6 +412,9 @@ class Player:
         self.name = "Default"
         self.game = game
 
+    def set_name(self, name):
+        self.name = name
+
     def refill_tilebox(self):
 
         bag_of_letter = self.game.bags_of_letters

@@ -16,11 +16,13 @@ def main():
     cpu_spinner = controller.CPUSpinnerController(ev_manager)
 
     human_player = model.Player(game)
+    human_player.set_name("Human")
 
     game.players.append(human_player)
     game.set_active_player(human_player)
 
     cpu_player = model.AIPlayer(game)
+    cpu_player.set_name("AI Player")
     game.players.append(cpu_player)
     game.main_player = game.players[0]
     ev_manager.post(events.NextPlayerMoveStartedEvent(game))
