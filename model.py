@@ -239,7 +239,8 @@ class Game:
             # validation
             try:
                 newly_added, tiles_with_fixed_neighbours = self.validator.verify_board(self.board, self.round_no)
-                # scoreCounter = score.ScoreCo
+                #todo -> score
+
                 self.active_player.score += 1
                 print(self.active_player.score)
                 self.board.fix_all()
@@ -247,11 +248,8 @@ class Game:
                 print(str(e))
                 self.ev_manager.post(events.MoveRejectedEvent())
                 return
-            # todo -> AI move
-
             self.set_active_player(self.players[self.index_of_next_player()])
             self.ev_manager.post(events.NextPlayerMoveStartedEvent(self))
-
 
         # todo -> handle buttons
         elif isinstance(event, events.ShuffleButtonPressedEvent):
@@ -316,11 +314,11 @@ class Game:
                 # todo -> scoreboard build event
 
             else:
-                # todo -> turn information
                 self.ev_manager.post(events.OtherPlayerTurnEvent(self.active_player))
                 if isinstance(self.active_player, AIPlayer):
                     self.active_player.refill_tilebox()
                     self.active_player.make_turn()
+                    # todo -> score of AI !!!!
                     self.board.fix_all()
                     self.set_active_player(self.players[self.index_of_next_player()])
                     self.ev_manager.post(events.NextPlayerMoveStartedEvent(self))
