@@ -170,6 +170,10 @@ class BagOfLetters:
             new_letters.append(self.__get_random_letter())
         return new_letters
 
+    def return_letters(self, letters):
+        for l in letters:
+            self.available_letters[l] += 1
+
 
 # game has 2 players, board, possible_words  and validator
 class Game:
@@ -212,7 +216,6 @@ class Game:
                     self.active_player.tilebox.active_field.state, field.state = field.state, self.active_player.tilebox.active_field.state
                     self.active_player.tilebox.set_active_field(None)
                     self.board.set_active_field(None)
-                # todo VALIDATION - tiles have just been swapped!!
             else:
                 if field.state is not FieldState.FIXED:
                     self.board.set_active_field(field)
@@ -229,7 +232,6 @@ class Game:
                     self.board.active_field.state, field.state = field.state, self.board.active_field.state
                     self.active_player.tilebox.set_active_field(None)
                     self.board.set_active_field(None)
-                # todo VALIDATION - tiles have just been swapped!!
             else:
                 if field.state is not FieldState.FIXED:
                     self.active_player.tilebox.set_active_field(field)
@@ -277,8 +279,26 @@ class Game:
 
         elif isinstance(event, events.SurrenderButtonPressedEvent):
             pass
-        elif isinstance(event, events.FactButtonPressedEvent):
-            pass
+
+        elif isinstance(event, events.TakeAllButtonEvent):
+            self.active_player.put_all_temps_in_tilebox()
+
+        elif isinstance(event, events.NewLettersButtonPressedEvent):
+            if self.active_player.letters_change_attempt < 2:
+                self.active_player.put_all_temps_in_tilebox()
+
+                letters = []
+                for field in self.active_player.tilebox.fields:
+                    if field.state == FieldState.TEMPORARY:
+                        letters.append(field.tile.character)
+                        field.state = FieldState.EMPTY
+                        field.tile = None
+                self.bags_of_letters.return_letters(letters)
+                self.active_player.refill_tilebox()
+                self.active_player.letters_change_attempt += 1
+                self.ev_manager.post(events.TileBoxBuildEvent(self.active_player.tilebox))
+            else:
+                print("It can be used only twice")
         elif isinstance(event, events.PassButtonPressedEvent):
             if self.round_no > 0:
                 print("PASS STRIKES", self.active_player.pass_strike,
@@ -295,8 +315,6 @@ class Game:
                     print("CANNOT USE PASS BUTTON DURING FIRST ROUND!")
 
 
-
-
         elif isinstance(event, events.NextPlayerMoveStartedEvent):
             self.ev_manager.post(events.ClearScreenEvent())
             self.board = event.game.board
@@ -304,20 +322,15 @@ class Game:
             self.active_player = event.game.active_player
 
             if event.game.active_player == self.main_player:
-                try:
-                    self.active_player.refill_tilebox()
-                    print("refiled")
-                except Exception as e:
-                    # todo end game
-                    print(str(e))
-                    pass
+
+                self.active_player.refill_tilebox()
+                print("refiled")
 
                 self.ev_manager.post(events.DrawGameButtonsEvent())
                 self.ev_manager.post(events.BoardBuildEvent(self.board))
                 self.ev_manager.post(events.TileBoxBuildEvent(self.active_player.tilebox))
                 self.ev_manager.post(events.ScoreBoardBuildEvent(ScoreBoard(self.players)))
                 self.round_no += 1
-                # todo -> scoreboard build event
 
             else:
                 self.ev_manager.post(events.ClearScreenEvent())
@@ -325,7 +338,7 @@ class Game:
                 if isinstance(self.active_player, AIPlayer):
                     self.active_player.refill_tilebox()
                     self.active_player.make_turn()
-                    # todo -> score of AI !!!!
+
                     score_counter = SC.ScoreCounter(self.board)
                     print("AI SCORE: (pre) ", self.active_player.score)
                     self.active_player.score += score_counter.count_score()
@@ -417,6 +430,7 @@ class TileBox(FieldsContainer):
 
 class Player:
     def __init__(self, game):
+        self.letters_change_attempt = 0
         self.score = 0
         self.tilebox = TileBox()
         self.pass_strike = 0
@@ -459,6 +473,17 @@ class Player:
 
     def pass_turn(self):
         pass
+
+    def put_all_temps_in_tilebox(self):
+        for i in range(config.BOARD_SIZE):
+            for j in range(config.BOARD_SIZE):
+                if self.game.board.fields[i][j].state == FieldState.TEMPORARY:
+                    for field in self.tilebox.fields:
+                        if field.state == FieldState.EMPTY:
+                            field.state, self.game.board.fields[i][j].state = self.game.board.fields[i][
+                                                                                  j].state, field.state
+                            field.tile, self.game.board.fields[i][j].tile = self.game.board.fields[i][
+                                                                                j].tile, field.tile
 
 
 class PlacementType(Enum):

@@ -106,19 +106,30 @@ class DrawGameButtonsEvent(ButtonEvent):
         pass_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Pass', 20, (51, 255, 53), (50, 50), 110, 550)
         surrender_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Surrender', 15, (51, 255, 53), (50, 50), 110,
                                        410)
-        random_fact_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Fact', 20, (51, 255, 53), (50, 50), 110, 340)
+        take_temps_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Letters', 15, (51, 255, 53), (50, 50), 110,
+                                        340)
+        take_all = view.Button(view.ButtonShapeType.RECTANGLE, 'Return', 15, (51, 255, 53), (50, 50), 110,
+                                        270)
+
         self.buttons = []
         self.buttons.append(confirm_button)
         self.buttons.append(shuffle_button)
         self.buttons.append(pass_button)
         self.buttons.append(surrender_button)
-        self.buttons.append(random_fact_button)
+        self.buttons.append(take_temps_button)
+        self.buttons.append(take_all)
 
 
 class ConfirmButtonEvent(ButtonEvent):
     def __init__(self):
         super().__init__()
         self.name = "ConfirmButtonEvent"
+
+
+class TakeAllButtonEvent(ButtonEvent):
+    def __init__(self):
+        super().__init__()
+        self.name = "TakeAllButtonEvent"
 
 
 class SelectFieldEvent(Event):
@@ -136,10 +147,10 @@ class ConfirmButtonPressedEvent(Event):
         self.name = "ConfirmButtonPressedEvent"
 
 
-class FactButtonPressedEvent(Event):
+class NewLettersButtonPressedEvent(Event):
     def __init__(self):
         super().__init__()
-        self.name = "FactButtonPressedEvent"
+        self.name = "NewLettersButtonPressedEvent"
 
 
 class ShuffleButtonPressedEvent(Event):
@@ -205,4 +216,3 @@ class AboutBannerShowEvent(Event):
     def __init__(self):
         super().__init__()
         self.name = "AboutBannerShowEvent"
-
