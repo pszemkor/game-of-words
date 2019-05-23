@@ -92,8 +92,11 @@ class MouseEventHandler:
             elif hasattr(sprite, 'button') and sprite.button.text == 'Shuffle':
                 ev_to_send = events.ShuffleButtonPressedEvent()
                 return ev_to_send
-            elif hasattr(sprite, 'button') and sprite.button.text == 'Fact':
-                ev_to_send = events.FactButtonPressedEvent()
+            elif hasattr(sprite, 'button') and sprite.button.text == 'Letters':
+                ev_to_send = events.NewLettersButtonPressedEvent()
+                return ev_to_send
+            elif hasattr(sprite, 'button') and sprite.button.text == 'Return':
+                ev_to_send = events.TakeAllButtonEvent()
                 return ev_to_send
             elif hasattr(sprite, 'button') and sprite.button.text == 'Surrender':
                 ev_to_send = events.SurrenderButtonPressedEvent()
