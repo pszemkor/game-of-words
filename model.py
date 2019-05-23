@@ -14,7 +14,6 @@ import itertools
 import dawg
 
 
-
 # todo -> algo do "AI"
 # todo ->
 
@@ -231,6 +230,7 @@ class Game:
             ev = events.UpdateFieldEvent(field)
             self.ev_manager.post(ev)
         elif isinstance(event, events.ConfirmButtonPressedEvent):
+            self.active_player.pass_strike = 0
             print('Clicked that MAGIC BUTTON!!!')
             # validation
             try:

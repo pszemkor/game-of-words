@@ -235,7 +235,7 @@ class GameView:
         self.background.fill((0, 0, 0))
         font = pygame.font.Font(None, 150)
         # text = "Brace yourself for\n" + player.get_name() + "\nmove!"
-        text = "Brave yourself!"
+        text = "Brace yourself!"
         text_img = font.render(text, 1, (255, 255, 255))
         text_rec = text_img.get_rect(center=(config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2))
         self.background.blit(text_img, text_rec)
