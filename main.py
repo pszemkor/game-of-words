@@ -3,11 +3,15 @@ import view
 import controller
 import controller_events as events
 import config
+import pygame
 
 
 # IMPORTANT - pygame.event.get() deletes read events, so be careful with the order of Controllers in event manager
 
 def main():
+    pygame.mixer.init()
+    pygame.mixer.music.load('Game of Thrones - Main Theme (Extended) HD.wav')
+    pygame.mixer.music.play(-1)
     ev_manager = controller.EventManager()
     game_view = view.GameView(ev_manager)
     game = model.Game(ev_manager)
@@ -53,4 +57,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
     # print(game.__str__())
