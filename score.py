@@ -8,7 +8,6 @@ class ScoreCounter:
         self.newly_added = newly_added
         self.tiles_with_fixed_neighbours = tiles_with_fixed_neighbours
 
-
     def __count_word_bonus(self, pos):
         factor = 1
         if self.board.fields[pos[0]][pos[1]].bonus == model.Bonus.BONUS_2W:
@@ -52,16 +51,16 @@ class ScoreCounter:
         return tiles_with_fixed_neighbour
 
     def __check_whether_has_vertical_neighbours(self, pos):
-        if pos[0] + 1 < config.BOARD_SIZE and self.board.fields[pos[0]+1][pos[1]].state == model.FieldState.FIXED:
+        if pos[0] + 1 < config.BOARD_SIZE and self.board.fields[pos[0] + 1][pos[1]].state == model.FieldState.FIXED:
             return True
-        if pos[0] - 1 >= 0 and self.board.fields[pos[0]-1][pos[1]].state == model.FieldState.FIXED:
+        if pos[0] - 1 >= 0 and self.board.fields[pos[0] - 1][pos[1]].state == model.FieldState.FIXED:
             return True
         return False
 
     def __check_whether_has_horizontal_neighbours(self, pos):
-        if pos[1] + 1 < config.BOARD_SIZE and self.board.fields[pos[0]][pos[1]+1].state == model.FieldState.FIXED:
+        if pos[1] + 1 < config.BOARD_SIZE and self.board.fields[pos[0]][pos[1] + 1].state == model.FieldState.FIXED:
             return True
-        if pos[1] - 1 >= 0 and self.board.fields[pos[0]][pos[1]-1].state == model.FieldState.FIXED:
+        if pos[1] - 1 >= 0 and self.board.fields[pos[0]][pos[1] - 1].state == model.FieldState.FIXED:
             return True
         return False
 
@@ -166,7 +165,8 @@ class ScoreCounter:
             for pos in self.tiles_with_fixed_neighbours:
                 if self.__check_whether_has_vertical_neighbours(pos):
                     print("counting extra vertical for letter: ", self.board.fields[pos[0]][pos[1]].tile.character, pos)
-                    score += self.vertical_word_score(pos) + self.board.fields[pos[0]][pos[1]].tile.get_value()
+                    score += self.vertical_word_score(pos) + self.board.fields[pos[0]][pos[1]].tile.get_value() \
+                             * self.__count_letter_bonus(pos)
                     score *= self.__count_word_bonus(pos)
                     print("got: ", self.vertical_word_score(pos))
 
@@ -220,7 +220,8 @@ class ScoreCounter:
             for pos in self.tiles_with_fixed_neighbours:
                 if self.__check_whether_has_horizontal_neighbours(pos):
                     print("counting extra vertical for letter: ", self.board.fields[pos[0]][pos[1]].tile.character, pos)
-                    score += self.horizontal_word_score(pos) + self.board.fields[pos[0]][pos[1]].tile.get_value()
+                    score += self.horizontal_word_score(pos) + self.board.fields[pos[0]][pos[1]].tile.get_value() \
+                             * self.__count_letter_bonus(pos)
                     score *= self.__count_word_bonus(pos)
                     print("got: ", self.vertical_word_score(pos), "curr score: ", score)
         return score

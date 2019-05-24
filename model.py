@@ -584,7 +584,8 @@ class AIPlayer(Player):
                 (end_x, end_y) = el[0]
                 i = end_x - len(word)
                 while i < end_x:
-                    self.game.board.fields[i][end_y].place_tile(Tile(word[index]))
+                    if self.game.board.fields[end_x][i].state == FieldState.EMPTY:
+                        self.game.board.fields[i][end_y].place_tile(Tile(word[index]))
                     i += 1
                     index += 1
                 # break
