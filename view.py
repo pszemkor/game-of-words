@@ -215,9 +215,11 @@ class GameView:
         # self.background.fill((0, 0, 0))
 
         self.clean('images/main_background.jpg')
-
+        pygame.time.delay(1650)
         self.print_line("Game", (config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2 - 200), 150, (0, 0, 0))
+        pygame.time.delay(1200)
         self.print_line("of", (config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2), 150, (0, 0, 0))
+        pygame.time.delay(1200)
         self.print_line("Words", (config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 2 + 200), 150, (0, 0, 0))
 
         self.back_sprites = pygame.sprite.RenderUpdates()
