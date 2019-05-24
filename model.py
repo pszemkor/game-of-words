@@ -1,5 +1,6 @@
 import csv
 import string
+import pygame
 # import io
 # import shutil
 import controller_events as events
@@ -286,8 +287,14 @@ class Game:
                 i += 1
 
         elif isinstance(event, events.SurrenderButtonPressedEvent):
-            print("SURRENDER!!!!")
             self.ev_manager.post(events.SurrenderEvent())
+
+        elif isinstance(event, events.MuteEvent):
+            pygame.mixer.music.stop()
+
+        elif isinstance(event, events.UnmuteEvent):
+            pygame.mixer.music.load('Game of Thrones S8 - The Night King - Ramin Djawadi (Official Video) (128  kbps).mp3')
+            pygame.mixer.music.play(-1)
 
         elif isinstance(event, events.TakeAllButtonEvent):
             self.active_player.put_all_temps_in_tilebox()

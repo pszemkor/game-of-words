@@ -127,6 +127,16 @@ class ButtonEvent(Event):
         self.name = "Button Event"
 
 
+class MuteEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "MuteEvent"
+
+class UnmuteEvent(Event):
+    def __init__(self):
+        super().__init__()
+        self.name = "UnmuteEvent"
+
 class DrawGameButtonsEvent(ButtonEvent):
     def __init__(self):
         super().__init__()
@@ -141,6 +151,11 @@ class DrawGameButtonsEvent(ButtonEvent):
         take_all = view.Button(view.ButtonShapeType.RECTANGLE, 'Return', 15, (80, 80, 80), (100, 50), 90,
                                270)
 
+        mute_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Mute', 15, (80, 80, 80), (90, 40), 830,
+                                60)
+        unmute_button =view.Button(view.ButtonShapeType.RECTANGLE, 'Unmute', 15, (80, 80, 80), (90, 40), 830,
+                                130)
+
         self.buttons = []
         self.buttons.append(confirm_button)
         self.buttons.append(shuffle_button)
@@ -148,6 +163,8 @@ class DrawGameButtonsEvent(ButtonEvent):
         self.buttons.append(surrender_button)
         self.buttons.append(take_temps_button)
         self.buttons.append(take_all)
+        self.buttons.append(mute_button)
+        self.buttons.append(unmute_button)
 
 
 class ConfirmButtonEvent(ButtonEvent):

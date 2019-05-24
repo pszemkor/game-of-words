@@ -85,6 +85,10 @@ class MouseEventHandler:
             ev_to_send = events.ConfirmButtonPressedEvent()
         elif hasattr(sprite, 'button') and sprite.button.text == 'Pass':
             ev_to_send = events.PassButtonPressedEvent()
+        elif hasattr(sprite, 'button') and sprite.button.text == 'Mute':
+            ev_to_send = events.MuteEvent()
+        elif hasattr(sprite, 'button') and sprite.button.text == 'Unmute':
+            ev_to_send = events.UnmuteEvent()
         elif hasattr(sprite, 'button') and sprite.button.text == 'Shuffle':
             ev_to_send = events.ShuffleButtonPressedEvent()
         elif hasattr(sprite, 'button') and sprite.button.text == 'Letters':
@@ -94,6 +98,9 @@ class MouseEventHandler:
         elif hasattr(sprite, 'button') and sprite.button.text == 'Surrender':
             ev_to_send = events.SurrenderButtonPressedEvent()
         elif hasattr(sprite, 'button') and sprite.button.text == 'Play':
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load('Game of Thrones S8 - The Night King - Ramin Djawadi (Official Video) (128  kbps).mp3')
+            pygame.mixer.music.play(-1)
             ev_to_send = events.NextPlayerMoveStartedEvent(self.game)
         elif hasattr(sprite, 'button') and sprite.button.text == 'About':
             ev_to_send = events.AboutBannerShowEvent()
