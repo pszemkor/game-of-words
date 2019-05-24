@@ -132,10 +132,12 @@ class MuteEvent(Event):
         super().__init__()
         self.name = "MuteEvent"
 
+
 class UnmuteEvent(Event):
     def __init__(self):
         super().__init__()
         self.name = "UnmuteEvent"
+
 
 class DrawGameButtonsEvent(ButtonEvent):
     def __init__(self):
@@ -152,9 +154,9 @@ class DrawGameButtonsEvent(ButtonEvent):
                                270)
 
         mute_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Mute', 15, (80, 80, 80), (90, 40), 830,
-                                60)
-        unmute_button =view.Button(view.ButtonShapeType.RECTANGLE, 'Unmute', 15, (80, 80, 80), (90, 40), 830,
-                                130)
+                                  60)
+        unmute_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Unmute', 15, (80, 80, 80), (90, 40), 830,
+                                    130)
 
         self.buttons = []
         self.buttons.append(confirm_button)
@@ -165,6 +167,19 @@ class DrawGameButtonsEvent(ButtonEvent):
         self.buttons.append(take_all)
         self.buttons.append(mute_button)
         self.buttons.append(unmute_button)
+
+
+class EditDashboardBuildEvent(ButtonEvent):
+    def __init__(self, board):
+        super().__init__()
+        self.name = 'EditDashboardBuildEvent'
+        save_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Save', 20, (80, 80, 80), (120, 50), 830, 580)
+        load_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Load', 20, (80, 80, 80), (100, 50), 90, 480)
+
+        self.buttons = []
+        self.buttons.append(save_button)
+        self.buttons.append(load_button)
+        self.board = board
 
 
 class ConfirmButtonEvent(ButtonEvent):
