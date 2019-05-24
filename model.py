@@ -290,12 +290,12 @@ class Game:
             self.ev_manager.post(events.SurrenderEvent())
 
         elif isinstance(event, events.MuteEvent):
-            pygame.mixer.music.stop()
+            pygame.mixer.music.pause()
 
         elif isinstance(event, events.UnmuteEvent):
-            pygame.mixer.music.load('Game of Thrones S8 - The Night King - Ramin Djawadi (Official Video) (128  kbps).mp3')
-            pygame.mixer.music.play(-1)
-
+            # pygame.mixer.music.load('music/Game of Thrones S8 - The Night King - Ramin Djawadi (Official Video) (128  kbps).mp3')
+            # pygame.mixer.music.play(-1)
+            pygame.mixer.music.unpause()
         elif isinstance(event, events.TakeAllButtonEvent):
             self.active_player.put_all_temps_in_tilebox()
 

@@ -99,7 +99,7 @@ class MouseEventHandler:
             ev_to_send = events.SurrenderButtonPressedEvent()
         elif hasattr(sprite, 'button') and sprite.button.text == 'Play':
             pygame.mixer.music.stop()
-            pygame.mixer.music.load('Game of Thrones S8 - The Night King - Ramin Djawadi (Official Video) (128  kbps).mp3')
+            pygame.mixer.music.load('music/Game of Thrones S8 - The Night King - Ramin Djawadi (Official Video) (128  kbps).mp3')
             pygame.mixer.music.play(-1)
             ev_to_send = events.NextPlayerMoveStartedEvent(self.game)
         elif hasattr(sprite, 'button') and sprite.button.text == 'About':

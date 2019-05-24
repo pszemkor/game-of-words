@@ -10,7 +10,7 @@ import pygame
 
 def main():
     pygame.mixer.init()
-    pygame.mixer.music.load('Game of Thrones - Main Theme (Extended) HD.wav')
+    pygame.mixer.music.load('music/Game of Thrones - Main Theme (Extended) HD.wav')
     pygame.mixer.music.play(-1)
     ev_manager = controller.EventManager()
     game_view = view.GameView(ev_manager)
