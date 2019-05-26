@@ -125,8 +125,14 @@ class MouseEventHandler:
         elif hasattr(sprite, 'button') and sprite.button.text == 'Load':
             Tk().withdraw()
             filename = askopenfilename()
+            print(filename)
             self.game.board.get_board_from_file(filename)
-            self.event_manager.post(events.EditDashboardBuildEvent(self.game.board))
+            ev_to_send = events.EditDashboardBuildEvent(self.game.board)
+        elif hasattr(sprite, 'button') and sprite.button.text == 'Load dictionary':
+            Tk().withdraw()
+            filename = askopenfilename()
+            self.game.dictionary.load_txt_file(filename)
+            print('Loaded from file')
 
         return ev_to_send
 

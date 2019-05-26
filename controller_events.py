@@ -92,14 +92,17 @@ class MenuBuildEvent(Event):
         play_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Play', 43, (80, 80, 80), (200, 80),
                                   config.WINDOW_WIDTH // 2 - 100, 300)
         set_difficulty_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Set difficulty', 21, (80, 80, 80),
-                                            (180, 80), config.WINDOW_WIDTH // 2 - 90, 400)
+                                            (180, 80), config.WINDOW_WIDTH // 2 - 185, 400)
+        load_dictionary_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Load dictionary', 21, (80, 80, 80),
+                                             (220, 80), config.WINDOW_WIDTH // 2 - 110, 500)
         edit_board_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Edit board', 21, (80, 80, 80), (180, 80),
-                                        config.WINDOW_WIDTH // 2 - 90, 500)
+                                        config.WINDOW_WIDTH // 2 + 5, 400)
         about_button = view.Button(view.ButtonShapeType.RECTANGLE, 'About', 21, (80, 80, 80), (180, 80),
                                    config.WINDOW_WIDTH // 2 - 90, 600)
         self.buttons = []
         self.buttons.append(play_button)
         self.buttons.append(set_difficulty_button)
+        self.buttons.append(load_dictionary_button)
         self.buttons.append(edit_board_button)
         self.buttons.append(about_button)
 
