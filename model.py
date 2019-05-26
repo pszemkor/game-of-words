@@ -237,7 +237,7 @@ class Game:
                         self.board.set_active_field(field)
             else:
                 # todo - >  edit board bonus
-                new_bonus = (field.bonus + 1) % len(Bonus)
+                new_bonus = (field.bonus + 1) % len(Bonus) + 1
                 field.bonus = 1 if new_bonus == 0 else new_bonus
 
             ev = events.UpdateFieldEvent(field)
