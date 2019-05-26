@@ -141,7 +141,7 @@ class DrawGameButtonsEvent(ButtonEvent):
     def __init__(self):
         super().__init__()
         self.name = 'DrawGameButtonsEvent'
-        confirm_button = view.Button(view.ButtonShapeType.CIRCLE, 'Confirm', 20, (80, 80, 80), (120, 120), 830, 560)
+        confirm_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Confirm', 20, (80, 80, 80), (120, 50), 830, 580)
         shuffle_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Shuffle', 20, (80, 80, 80), (100, 50), 90, 480)
         pass_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Pass', 20, (80, 80, 80), (100, 50), 90, 550)
         surrender_button = view.Button(view.ButtonShapeType.RECTANGLE, 'Surrender', 15, (80, 80, 80), (100, 50), 90,
