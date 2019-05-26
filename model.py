@@ -63,25 +63,28 @@ class Board(FieldsContainer):
         self.get_board_from_file()
 
     # todo -> default file -> board.txt
-    def get_board_from_file(self):
+    def get_board_from_file(self, path="board.txt"):
         row = 0
-        with open("board.txt", "r+") as f:
-            lines = f.readlines()
-            for line in lines:
-                line = line.split(", ")
-                print(line)
-                line_iter = 0
-                for field in self.fields[row]:
-                    if line[line_iter].strip() == "2W":
-                        field.bonus = Bonus.BONUS_2W
-                    elif line[line_iter].strip() == "3W":
-                        field.bonus = Bonus.BONUS_3W
-                    elif line[line_iter].strip() == "2L":
-                        field.bonus = Bonus.BONUS_2L
-                    elif line[line_iter].strip() == "3L":
-                        field.bonus = Bonus.BONUS_3L
-                    line_iter += 1
-                row += 1
+        try:
+            with open(path, "r+") as f:
+                lines = f.readlines()
+                for line in lines:
+                    line = line.split(", ")
+                    print(line)
+                    line_iter = 0
+                    for field in self.fields[row]:
+                        if line[line_iter].strip() == "2W":
+                            field.bonus = Bonus.BONUS_2W
+                        elif line[line_iter].strip() == "3W":
+                            field.bonus = Bonus.BONUS_3W
+                        elif line[line_iter].strip() == "2L":
+                            field.bonus = Bonus.BONUS_2L
+                        elif line[line_iter].strip() == "3L":
+                            field.bonus = Bonus.BONUS_3L
+                        line_iter += 1
+                    row += 1
+        except Exception:
+            self.ev_manager.post(events.EditDashboardBuildEvent(self))
 
     def __str__(self):
         string = ""
@@ -219,17 +222,24 @@ class Game:
         # handle board active field selection
         if isinstance(event, events.SelectFieldEvent) and event.field_group == FieldGroup.BOARD:
             field = event.field
-            if field.is_active:
-                self.board.set_active_field(None)
-                # tilebox has active field -> will swap tiles
-                if self.active_player.tilebox.active_field is not None and self.active_player.tilebox.active_field is not FieldState.FIXED:
-                    self.active_player.tilebox.active_field.tile, field.tile = field.tile, self.active_player.tilebox.active_field.tile
-                    self.active_player.tilebox.active_field.state, field.state = field.state, self.active_player.tilebox.active_field.state
-                    self.active_player.tilebox.set_active_field(None)
+
+            if self.ev_manager.screen_state == controller.ScreenState.NORMAL:
+                if field.is_active:
                     self.board.set_active_field(None)
+                    # tilebox has active field -> will swap tiles
+                    if self.active_player.tilebox.active_field is not None and self.active_player.tilebox.active_field is not FieldState.FIXED:
+                        self.active_player.tilebox.active_field.tile, field.tile = field.tile, self.active_player.tilebox.active_field.tile
+                        self.active_player.tilebox.active_field.state, field.state = field.state, self.active_player.tilebox.active_field.state
+                        self.active_player.tilebox.set_active_field(None)
+                        self.board.set_active_field(None)
+                else:
+                    if field.state is not FieldState.FIXED:
+                        self.board.set_active_field(field)
             else:
-                if field.state is not FieldState.FIXED:
-                    self.board.set_active_field(field)
+                # todo - >  edit board bonus
+                new_bonus = (field.bonus + 1) % len(Bonus)
+                field.bonus = 1 if new_bonus == 0 else new_bonus
+
             ev = events.UpdateFieldEvent(field)
             self.ev_manager.post(ev)
         # handle tilebox active field selection
@@ -341,7 +351,6 @@ class Game:
 
                 self.active_player.refill_tilebox()
                 print("refiled")
-
 
                 self.ev_manager.post(events.TitleBuildEvent())
                 self.ev_manager.post(events.DifficultyLevelDash(self.difficulty_level))

@@ -364,6 +364,12 @@ class GameView:
         self.print_line('Select level of difficulty', (config.WINDOW_WIDTH / 2, 180), 50, (0, 0, 0))
         self.show_buttons(buttons)
 
+    def build_edit_dashboard(self, buttons, board):
+        self.clean('images/main_background.jpg')
+        self.print_line('Edit  fields  on  board', (config.WINDOW_WIDTH / 2, 50), 50, (0, 0, 0))
+        self.show_buttons(buttons)
+        self.show_board(board)
+
     def game_end(self, event):
         if event.players[0].score > event.players[1].score:
             self.clean("images/win_view.jpg")
@@ -420,3 +426,5 @@ class GameView:
             self.show_difficulty_dash(event.difficulty_level)
         elif isinstance(event, events.TitleBuildEvent):
             self.show_title()
+        elif isinstance(event, events.EditDashboardBuildEvent):
+            self.build_edit_dashboard(event.buttons, event.board)

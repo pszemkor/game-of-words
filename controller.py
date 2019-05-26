@@ -5,16 +5,17 @@ import controller_events as events
 import config
 import view
 import model
-
+from tkinter import Tk
+from tkinter.filedialog import askopenfilename
 
 class ScreenState(Enum):
-    MENU = 0
-    GAME = 1
-    END_SCORE = 2
-    ABOUT = 3
-    BAG_OF_LETTERS = 4
-    SETTINGS_MENU = 5
-    BOARD_EDITOR = 6
+    NORMAL = 0
+    EDIT = 1
+    # END_SCORE = 2
+    # ABOUT = 3
+    # BAG_OF_LETTERS = 4
+    # SETTINGS_MENU = 5
+    # BOARD_EDITOR = 6
 
 
 def Debug(msg):
@@ -33,7 +34,7 @@ class EventManager:
     def __init__(self):
         from weakref import WeakKeyDictionary
         self.listeners = WeakKeyDictionary()
-        self.screen_state = ScreenState.GAME
+        self.screen_state = ScreenState.NORMAL
 
     def register(self, listener):
         self.listeners[listener] = 1
@@ -115,6 +116,17 @@ class MouseEventHandler:
         elif hasattr(sprite, 'button') and sprite.button.text == 'Hard':
             self.game.difficulty_level = model.DifficultyLevel.HARD
             ev_to_send = events.MenuBuildEvent()
+        elif hasattr(sprite, 'button') and sprite.button.text == 'Edit board':
+            self.event_manager.screen_state = ScreenState.EDIT
+            ev_to_send = events.EditDashboardBuildEvent(self.game.board)
+        elif hasattr(sprite, 'button') and sprite.button.text == 'Save':
+            self.event_manager.screen_state = ScreenState.NORMAL
+            ev_to_send = events.MenuBuildEvent()
+        elif hasattr(sprite, 'button') and sprite.button.text == 'Load':
+            Tk().withdraw()
+            filename = askopenfilename()
+            self.game.board.get_board_from_file(filename)
+            self.event_manager.post(events.EditDashboardBuildEvent(self.game.board))
 
         return ev_to_send
 
