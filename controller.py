@@ -11,11 +11,11 @@ class ScreenState(Enum):
     EDIT = 1
 
 
-def Debug(msg):
+def debug(msg):
     print(msg)
 
 
-def In2dArray(array, el_searched):
+def in2darray(array, el_searched):
     for row in array:
         for e in row:
             if e == el_searched:
@@ -38,7 +38,7 @@ class EventManager:
 
     def post(self, event):
         if not isinstance(event, events.TickEvent):
-            Debug("     Message: " + event.name)
+            debug("     Message: " + event.name)
         for listener in self.listeners.keys():
             listener.notify(event)
 
@@ -71,10 +71,14 @@ class MouseEventHandler:
     def get_event_from_clicked_sprites(self, sprites):
         ev_to_send = None
         sprite = sprites[0]
-        if hasattr(sprite, 'field') and In2dArray(self.game.board.fields, sprite.field):
-            ev_to_send = events.SelectFieldEvent(sprite.field, model.FieldGroup.BOARD)
-        elif hasattr(sprite, 'field') and sprite.field in self.game.active_player.tilebox.fields:
-            ev_to_send = events.SelectFieldEvent(sprite.field, model.FieldGroup.TILEBOX)
+        if hasattr(sprite, 'field') and in2darray(
+                self.game.board.fields, sprite.field):
+            ev_to_send = events.SelectFieldEvent(sprite.field,
+                                                 model.FieldGroup.BOARD)
+        elif hasattr(sprite, 'field') and sprite.field in \
+                self.game.active_player.tilebox.fields:
+            ev_to_send = events.SelectFieldEvent(sprite.field,
+                                                 model.FieldGroup.TILEBOX)
         elif hasattr(sprite, 'button') and sprite.button.text == 'Confirm':
             ev_to_send = events.ConfirmButtonPressedEvent()
         elif hasattr(sprite, 'button') and sprite.button.text == 'Pass':
@@ -95,12 +99,14 @@ class MouseEventHandler:
         elif hasattr(sprite, 'button') and sprite.button.text == 'Play':
             pygame.mixer.music.stop()
             pygame.mixer.music.load(
-                'music/Game of Thrones S8 - The Night King - Ramin Djawadi (Official Video) (128  kbps).mp3')
+                'music/Game of Thrones S8 - The Night '
+                'King - Ramin Djawadi (Official Video) (128  kbps).mp3')
             pygame.mixer.music.play(-1)
             ev_to_send = events.NextPlayerMoveStartedEvent(self.game)
         elif hasattr(sprite, 'button') and sprite.button.text == 'About':
             ev_to_send = events.AboutBannerShowEvent()
-        elif hasattr(sprite, 'button') and sprite.button.text == 'Set difficulty':
+        elif hasattr(sprite, 'button') and sprite.button.text \
+                == 'Set difficulty':
             ev_to_send = events.MenuDifficultyBuildEvent()
         elif hasattr(sprite, 'button') and sprite.button.text == 'Easy':
             self.game.difficulty_level = model.DifficultyLevel.EASY
@@ -120,10 +126,10 @@ class MouseEventHandler:
         elif hasattr(sprite, 'button') and sprite.button.text == 'Load':
             Tk().withdraw()
             filename = askopenfilename()
-            print(filename)
             self.game.board.get_board_from_file(filename)
             ev_to_send = events.EditDashboardBuildEvent(self.game.board)
-        elif hasattr(sprite, 'button') and sprite.button.text == 'Load dictionary':
+        elif hasattr(sprite, 'button') \
+                and sprite.button.text == 'Load dictionary':
             Tk().withdraw()
             filename = askopenfilename()
             self.game.dictionary.load_txt_file(filename)
@@ -149,10 +155,13 @@ class MouseController:
                 # left mouse button
                 elif ev.type == pygame.MOUSEBUTTONUP:
                     if ev.button == 1:
-                        all_sprites = list(self.view.back_sprites) + list(self.view.front_sprites)
-                        clicked_sprites = [s for s in all_sprites if s.rect.collidepoint(ev.pos)]
+                        all_sprites = list(self.view.back_sprites) + \
+                                      list(self.view.front_sprites)
+                        clicked_sprites = [s for s in all_sprites
+                                           if s.rect.collidepoint(ev.pos)]
                         if len(clicked_sprites) > 0:
-                            event_to_send = self.mouse_event_handler.get_event_from_clicked_sprites(clicked_sprites)
+                            event_to_send = self.mouse_event_handler. \
+                                get_event_from_clicked_sprites(clicked_sprites)
                         pass
 
                 if event_to_send:

@@ -7,13 +7,15 @@ import pygame
 
 def main():
     pygame.mixer.init()
-    pygame.mixer.music.load('music/Game of Thrones - Main Theme (Extended) HD.mp3')
+    pygame.mixer.music.\
+        load('music/Game of Thrones - Main Theme (Extended) HD.mp3')
     pygame.mixer.music.play(-1)
     ev_manager = controller.EventManager()
     game_view = view.GameView(ev_manager)
     game = model.Game(ev_manager)
 
     mouse_controller = controller.MouseController(ev_manager, game_view, game)
+    mouse_controller.notify(events.TickEvent())
     cpu_spinner = controller.CPUSpinnerController(ev_manager)
 
     human_player = model.Player(game)

@@ -16,7 +16,8 @@ class Validator:
                 wildcards.append(i)
         if len(wildcards) == 0:
             return word in self.dawg
-        permutations = itertools.permutations(string.ascii_lowercase, len(wildcards))
+        permutations = itertools.permutations(
+            string.ascii_lowercase, len(wildcards))
         for p in permutations:
             for i in range(len(wildcards)):
                 word = list(word)
@@ -32,12 +33,10 @@ class Validator:
             if horizontal_sorted[0][0] == horizontal_sorted[1][0]:
                 for i in range(len(horizontal_sorted) - 2):
                     if horizontal_sorted[i][0] != horizontal_sorted[i + 1][0]:
-                        print("H: ", horizontal_sorted[i][0], horizontal_sorted[i + 1][0])
                         return False
             else:
                 for i in range(len(vertical_sorted) - 2):
                     if vertical_sorted[i][1] != vertical_sorted[i + 1][1]:
-                        print("V: ", vertical_sorted[i][1], vertical_sorted[i + 1][1])
                         return False
 
         return True
@@ -48,13 +47,17 @@ class Validator:
         horizontal_sorted = sorted(newly_added, key=lambda x: x[1])
         vertical_sorted = sorted(newly_added, key=lambda x: x[0])
         if horizontal_sorted[0][0] == horizontal_sorted[1][0]:
-            for y in range(horizontal_sorted[0][1], horizontal_sorted[::-1][0][1] + 1):
-                if board.fields[horizontal_sorted[0][0]][y].state == model.FieldState.EMPTY:
+            for y in range(horizontal_sorted[0][1],
+                           horizontal_sorted[::-1][0][1] + 1):
+                if board.fields[horizontal_sorted[0][0]][y].state == \
+                        model.FieldState.EMPTY:
                     raise Exception("Tiles don't belong to one word!")
 
         else:
-            for x in range(vertical_sorted[0][0], vertical_sorted[::-1][0][0] + 1):
-                if board.fields[x][vertical_sorted[0][1]].state == model.FieldState.EMPTY:
+            for x in range(vertical_sorted[0][0],
+                           vertical_sorted[::-1][0][0] + 1):
+                if board.fields[x][vertical_sorted[0][1]].state == \
+                        model.FieldState.EMPTY:
                     raise Exception("Tiles don't belong to one word!")
 
     def __check_fixed_neighbour(self, pos, board):
@@ -64,66 +67,77 @@ class Validator:
             x_neigh = pos[0] + x_dirs[i]
             y_neigh = pos[1] + y_dirs[i]
 
-            if config.BOARD_SIZE > x_neigh >= 0 and config.BOARD_SIZE > y_neigh >= 0 and \
-                    board.fields[x_neigh][y_neigh].state == model.FieldState.FIXED:
+            if config.BOARD_SIZE > x_neigh >= 0 and \
+                    config.BOARD_SIZE > y_neigh >= 0 and \
+                    board.fields[x_neigh][y_neigh].state ==\
+                    model.FieldState.FIXED:
                 return True
         return False
 
     def __verify_check_cross(self, pos, board):
 
         # horizontal verification
-        if (pos[1] - 1 >= 0 and board.fields[pos[0]][pos[1] - 1].state == model.FieldState.FIXED) or \
-                (pos[1] + 1 < config.BOARD_SIZE and board.fields[pos[0]][pos[1] + 1].state == model.FieldState.FIXED):
+        if (pos[1] - 1 >= 0 and board.fields[pos[0]][pos[1] - 1].state ==
+            model.FieldState.FIXED) or \
+                (pos[1] + 1 < config.BOARD_SIZE and
+                 board.fields[pos[0]][pos[1] + 1].state ==
+                 model.FieldState.FIXED):
 
             partial_word = ""
             for i in range(pos[1] - 1, -1, -1):
                 curr_field = board.fields[pos[0]][i]
-                if curr_field.state in [model.FieldState.FIXED, model.FieldState.TEMPORARY]:
+                if curr_field.state in [model.FieldState.FIXED,
+                                        model.FieldState.TEMPORARY]:
                     partial_word += curr_field.tile.character
                 else:
                     break
-            # print("h verification1: ", partial_word)
             partial_word = partial_word[::-1]
 
             for i in range(pos[1], config.BOARD_SIZE):
                 curr_field = board.fields[pos[0]][i]
-                if curr_field.state in [model.FieldState.FIXED, model.FieldState.TEMPORARY]:
+                if curr_field.state in [model.FieldState.FIXED,
+                                        model.FieldState.TEMPORARY]:
                     partial_word += curr_field.tile.character
                 else:
                     break
-            # print("h verification2: ", partial_word)
             if not self.check_word(partial_word):
-                raise Exception("Word ", partial_word, " associated with pos: ", pos, " does not exist!")
+                raise Exception("Word ", partial_word,
+                                " associated with pos: ",
+                                pos, " does not exist!")
             else:
                 print("word ", partial_word, "exists")
 
         # vertical verification
-        if (pos[0] - 1 >= 0 and board.fields[pos[0] - 1][pos[1]].state == model.FieldState.FIXED) or \
-                (pos[0] + 1 < config.BOARD_SIZE and board.fields[pos[0] + 1][pos[1]].state == model.FieldState.FIXED):
+        if (pos[0] - 1 >= 0 and board.fields[pos[0] - 1][pos[1]].state ==
+            model.FieldState.FIXED) or \
+                (pos[0] + 1 < config.BOARD_SIZE and
+                 board.fields[pos[0] + 1][pos[1]].state ==
+                 model.FieldState.FIXED):
             partial_word = ""
             for i in range(pos[0] - 1, -1, -1):
                 curr_field = board.fields[i][pos[1]]
-                if curr_field.state in [model.FieldState.FIXED, model.FieldState.TEMPORARY]:
+                if curr_field.state in [model.FieldState.FIXED,
+                                        model.FieldState.TEMPORARY]:
                     partial_word += curr_field.tile.character
                 else:
                     break
-            # print("vertical verification1: ", partial_word)
             partial_word = partial_word[::-1]
 
             for i in range(pos[0], config.BOARD_SIZE):
                 curr_field = board.fields[i][pos[1]]
-                if curr_field.state in [model.FieldState.FIXED, model.FieldState.TEMPORARY]:
+                if curr_field.state in [model.FieldState.FIXED,
+                                        model.FieldState.TEMPORARY]:
                     partial_word += curr_field.tile.character
                 else:
                     break
-            # print("vertical verification2: ", partial_word)
             if not self.check_word(partial_word):
-                raise Exception("Word ", partial_word, " associated with pos: ", pos, " does not exist!")
+                raise Exception("Word ", partial_word,
+                                " associated with pos: ",
+                                pos, " does not exist!")
             else:
                 print("word ", partial_word, "exists")
 
     def verify_board(self, board, round):
-        # print("here")
         newly_added = []
         for row in range(config.BOARD_SIZE):
             col = 0
@@ -131,23 +145,20 @@ class Validator:
                 if field.state == model.FieldState.TEMPORARY:
                     newly_added.append((row, col))
                 col += 1
-        print("newly added: ", newly_added)
         if len(newly_added) == 0:
             raise Exception("You have to put tile")
 
         if not self.__check_whether_one_line(newly_added):
             print(newly_added)
             raise Exception("Tiles are not in one line!")
-        print("one line!")
         tiles_with_fixed_neighbour = []
         for pos in newly_added:
             if self.__check_fixed_neighbour(pos, board):
                 tiles_with_fixed_neighbour.append(pos)
-        print("neighbours checked ", tiles_with_fixed_neighbour)
         self.__check_whether_one_word(board, newly_added)
-        print("whether one word")
         if round == 0:
-            if (config.BOARD_SIZE // 2, config.BOARD_SIZE // 2) not in newly_added:
+            if (config.BOARD_SIZE // 2, config.BOARD_SIZE // 2)\
+                    not in newly_added:
                 raise Exception("You have to start from the mid!")
             if len(newly_added) == 1:
                 raise Exception("You have to put at least two tiles")
