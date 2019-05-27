@@ -1,11 +1,7 @@
-# GLOBAL PARAMETERS
-# view parameters - width 1000 px., height 700 px.
-
 import pygame
 from enum import Enum
 import controller_events as events
 import config
-import controller
 import model
 
 
@@ -75,7 +71,6 @@ class ButtonSprite(pygame.sprite.Sprite):
         self.image = pygame.Surface(self.button.shape)
         self.update()
 
-    # DRY util
     def __blit(self):
         font = pygame.font.Font(config.FONT_PATH, self.button.font_size)
         text_img = font.render(self.button.text, 1, (255, 255, 255))
@@ -100,7 +95,6 @@ class BannerSprite(pygame.sprite.Sprite):
         self.image = pygame.Surface(self.banner.shape)
         self.update()
 
-    # DRY util
     def __blit(self):
         font = pygame.font.Font(config.FONT_PATH, self.banner.font_size)
         text_img = font.render(self.banner.text, 1, (255, 255, 255))
@@ -203,7 +197,6 @@ class Banner:
 
 
 class GameView:
-    # def __init__(self, evManager):
     def __init__(self, evManager):
         self.evManager = evManager
         self.evManager.register(self)
@@ -212,7 +205,6 @@ class GameView:
         self.window = pygame.display.set_mode((config.WINDOW_WIDTH, config.WINDOW_HEIGHT))
         pygame.display.set_caption('Game of Words')
         self.background = pygame.Surface(self.window.get_size())
-        # self.background.fill((0, 0, 0))
 
         self.clean('images/main_background.jpg')
         pygame.time.delay(1650)
@@ -226,17 +218,9 @@ class GameView:
         self.front_sprites = pygame.sprite.RenderUpdates()
 
         pygame.time.delay(1000)
-        # pygame.time.delay(200)
 
     def show_board(self, board):
-        # self.background.fill((0, 0, 0))
-        # self.window.blit(self.background, (0, 0))
         pygame.display.flip()
-
-        # field_rect = pygame.Rect(
-        #     (config.LEFT_EDGE_BOARD_OFFSET - config.FIELD_RECTANGLE_WIDTH, config.TOP_EDGE_BOARD_OFFSET,
-        #      config.FIELD_RECTANGLE[0], config.FIELD_RECTANGLE[0]))
-
         column = 0
 
         field_rect = pygame.Rect(
@@ -254,7 +238,6 @@ class GameView:
                 column += 1
                 new_field_sprite = FieldSprite(field, self.back_sprites)
                 new_field_sprite.rect = field_rect
-                # new_field_sprite = None
 
     def show_tilebox(self, tilebox):
         field_rect = pygame.Rect(
@@ -262,14 +245,11 @@ class GameView:
              config.FIELD_RECTANGLE[0],
              config.FIELD_RECTANGLE[0]))
 
-        # column = 0
         for field in tilebox.fields:
             field_rect = field_rect.move(config.FIELD_RECTANGLE_WIDTH, 0)
             new_field_sprite = FieldSprite(field, self.back_sprites)
             new_field_sprite.rect = field_rect
-            # new_field_sprite = None
 
-    # buttons are drawn in the foreground
     def show_button(self, button):
         button_rect = pygame.Rect((button.left_edge_offset, button.top_edge_offset,
                                    button.shape[0], button.shape[1] if button.type == ButtonShapeType.RECTANGLE
@@ -308,7 +288,7 @@ class GameView:
         self.window.blit(self.background, (0, 0))
         pygame.display.flip()
 
-    def show_other_player_move_banner(self, player):
+    def show_other_player_move_banner(self):
         self.clean('images/background.jpg')
         self.print_line("Brace", (config.WINDOW_WIDTH // 2 - 300, 200), 100, (0, 0, 0))
         self.print_line("yourself!", (config.WINDOW_WIDTH // 2 - 200, 350), 100, (0, 0, 0))
@@ -403,7 +383,7 @@ class GameView:
         elif isinstance(event, events.DrawGameButtonsEvent):
             self.show_buttons(event.buttons)
         elif isinstance(event, events.OtherPlayerTurnEvent):
-            self.show_other_player_move_banner(event.player)
+            self.show_other_player_move_banner()
         elif isinstance(event, events.ScoreBoardBuildEvent):
             self.show_score_board(event.score_board)
         elif isinstance(event, events.MenuBuildEvent):
