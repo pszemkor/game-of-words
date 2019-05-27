@@ -15,6 +15,7 @@ import itertools
 import dawg
 import score as SC
 import view
+from random import shuffle
 
 
 # todo -> algo do "AI"
@@ -591,6 +592,7 @@ class AIPlayer(Player):
         if len(all_possible_words) != 0:
             self.pass_strike = 0
             all_possible_words_list = [(x, self.all_possible_words_dict[x]) for x in self.all_possible_words_dict]
+            shuffle(all_possible_words_list)
             all_possible_words_list = sorted(all_possible_words_list, key=lambda x: len(x[1][0]))
             print(all_possible_words_list)
             if self.game.difficulty_level == DifficultyLevel.EASY:
