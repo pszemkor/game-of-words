@@ -1,21 +1,14 @@
 import pygame
-from pygame.locals import *
 from enum import Enum
 import controller_events as events
-import config
-import view
 import model
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
+
 class ScreenState(Enum):
     NORMAL = 0
     EDIT = 1
-    # END_SCORE = 2
-    # ABOUT = 3
-    # BAG_OF_LETTERS = 4
-    # SETTINGS_MENU = 5
-    # BOARD_EDITOR = 6
 
 
 def Debug(msg):
@@ -101,7 +94,8 @@ class MouseEventHandler:
             ev_to_send = events.SurrenderButtonPressedEvent()
         elif hasattr(sprite, 'button') and sprite.button.text == 'Play':
             pygame.mixer.music.stop()
-            pygame.mixer.music.load('music/Game of Thrones S8 - The Night King - Ramin Djawadi (Official Video) (128  kbps).mp3')
+            pygame.mixer.music.load(
+                'music/Game of Thrones S8 - The Night King - Ramin Djawadi (Official Video) (128  kbps).mp3')
             pygame.mixer.music.play(-1)
             ev_to_send = events.NextPlayerMoveStartedEvent(self.game)
         elif hasattr(sprite, 'button') and sprite.button.text == 'About':

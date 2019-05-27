@@ -1,27 +1,15 @@
-import csv
 import string
 import pygame
-# import io
-# import shutil
 import controller_events as events
 from enum import Enum, IntEnum
 import config
 import controller
 from validator import Validator
-# from lexpy.dawg import DAWG
-# from lexpy.trie import Trie
-from collections import Counter
 import itertools
 import dawg
 import score as SC
-import view
-from random import shuffle
 
 
-# todo -> algo do "AI"
-# todo ->
-
-# introduced because Board and Tilebox share some methods
 class FieldsContainer:
     def __init__(self):
         self.active_field = None
@@ -58,12 +46,8 @@ class Board(FieldsContainer):
         self.fields = [[Field(Bonus.NO_BONUS) for i in range(config.BOARD_SIZE)] for j in range(config.BOARD_SIZE)]
         self.ev_manager = ev_manager
         self.ev_manager.register(self)
-        #
-        # event_to_send = events.BoardBuildEvent(self)
-        # self.ev_manager.post(event_to_send)
         self.get_board_from_file()
 
-    # todo -> default file -> board.txt
     def get_board_from_file(self, path="board.txt"):
         row = 0
         try:
@@ -87,7 +71,7 @@ class Board(FieldsContainer):
                         line_iter += 1
                     row += 1
         except Exception:
-            print('Something went wrong')
+            print('Something went wrong when loading board from file')
             self.ev_manager.post(events.EditDashboardBuildEvent(self))
 
     def __str__(self):
@@ -108,24 +92,6 @@ class Board(FieldsContainer):
             string += '\n'
         return string
 
-    # def print_bonus(self):
-    #     string = ""
-    #     for row in self.fields:
-    #         for el in row:
-    #                 if el.bonus is Bonus.NO_BONUS:
-    #                     string = string + "  |"
-    #                 elif el.bonus is Bonus.BONUS_2L:
-    #                     string = string + "2L|"
-    #                 elif el.bonus is Bonus.BONUS_3L:
-    #                     string = string + "3L|"
-    #                 elif el.bonus is Bonus.BONUS_2W:
-    #                     string = string + "2W|"
-    #                 else:
-    #                     string = string + "3W|"
-    #
-    #         string += '\n'
-    #     return string
-
     def notify(self, event):
         pass
 
@@ -142,17 +108,6 @@ class Board(FieldsContainer):
 class Dictionary:
     def __init__(self):
         possible_words_set = set()
-        # for c in string.ascii_uppercase:
-        #     file = "words/" + c + "word.csv"
-        #     with open(file, 'r', encoding='UTF-8', newline='') as csvFile:
-        #         reader = csv.reader(csvFile)
-        #         print("Read file", file)
-        #         for row in reader:
-        #             word = ''.join(x for x in row[0] if x.isalpha())
-        #             if word == 'oft':
-        #                 print('will add oft to set', word)
-        #             possible_words_set.add(word)
-
         possible_words_list = filter(lambda x: len(x) > 1, sorted(list(possible_words_set)))
         self.possible_words = dawg.CompletionDAWG(possible_words_list)
 
@@ -167,7 +122,7 @@ class Dictionary:
             possible_words_list = filter(lambda x: len(x) > 1, sorted(list(possible_words_set)))
             self.possible_words = dawg.CompletionDAWG(possible_words_list)
         except Exception:
-            possible_words_set = set()
+            self.possible_words = dawg.CompletionDAWG()
 
     def prefix_exists(self, prefix):
         return self.possible_words.has_keys_with_prefix(prefix)
@@ -226,8 +181,6 @@ class Game:
         self.validator = Validator(ev_manager, self.dictionary.possible_words)
         self.round_no = -1
         self.difficulty_level = DifficultyLevel.MEDIUM
-        # ev = events.DrawGameButtonsEvent()
-        # self.ev_manager.post(ev)
 
     def __str__(self):
         return self.board.__str__()
@@ -261,7 +214,6 @@ class Game:
                     if field.state is not FieldState.FIXED:
                         self.board.set_active_field(field)
             else:
-                # todo - >  edit board bonus
                 field.bonus = (field.bonus + 1) % len(Bonus) + 1
 
             ev = events.UpdateFieldEvent(field)
@@ -284,15 +236,12 @@ class Game:
             self.ev_manager.post(ev)
         elif isinstance(event, events.ConfirmButtonPressedEvent):
             self.active_player.pass_strike = 0
-            print('Clicked that MAGIC BUTTON!!!')
             # validation
             try:
-                newly_added, tiles_with_fixed_neighbours = self.validator.verify_board(self.board, self.round_no)
-                # todo -> score
                 score_counter = SC.ScoreCounter(self.board)
-                print("PLAYER SCORE: (pre) ", self.active_player.score)
+                # print("PLAYER SCORE: (pre) ", self.active_player.score)
                 self.active_player.score += score_counter.count_score()
-                print("PLAYER SCORE: ", self.active_player.score)
+                # print("PLAYER SCORE: ", self.active_player.score)
                 self.board.fix_all()
             except Exception as e:
                 print(str(e))
@@ -301,7 +250,6 @@ class Game:
             self.set_active_player(self.players[self.index_of_next_player()])
             self.ev_manager.post(events.NextPlayerMoveStartedEvent(self))
 
-        # todo -> handle buttons
         elif isinstance(event, events.ShuffleButtonPressedEvent):
             fields = self.active_player.tilebox.fields
             tiles = []
@@ -327,8 +275,6 @@ class Game:
             pygame.mixer.music.pause()
 
         elif isinstance(event, events.UnmuteEvent):
-            # pygame.mixer.music.load('music/Game of Thrones S8 - The Night King - Ramin Djawadi (Official Video) (128  kbps).mp3')
-            # pygame.mixer.music.play(-1)
             pygame.mixer.music.unpause()
         elif isinstance(event, events.TakeAllButtonEvent):
             self.active_player.put_all_temps_in_tilebox()
@@ -374,7 +320,7 @@ class Game:
             if event.game.active_player == self.main_player:
 
                 self.active_player.refill_tilebox()
-                print("refiled")
+                print("refilled")
 
                 self.ev_manager.post(events.TitleBuildEvent())
                 self.ev_manager.post(events.DifficultyLevelDash(self.difficulty_level))
@@ -392,9 +338,9 @@ class Game:
                     self.active_player.make_turn()
 
                     score_counter = SC.ScoreCounter(self.board)
-                    print("AI SCORE: (pre) ", self.active_player.score)
+                    # print("AI SCORE: (pre) ", self.active_player.score)
                     self.active_player.score += score_counter.count_score()
-                    print("AI SCORE: ", self.active_player.score)
+                    # print("AI SCORE: ", self.active_player.score)
                     self.board.fix_all()
                     self.set_active_player(self.players[self.index_of_next_player()])
                     self.ev_manager.post(events.NextPlayerMoveStartedEvent(self))
@@ -417,7 +363,8 @@ class FieldState(Enum):
     TEMPORARY = 1
     FIXED = 2
 
-    # board consists of Fields, and every field can have some tile or just be empty
+
+# board consists of Fields, and every field can have some tile or just be empty
 
 
 class Field:
@@ -493,7 +440,6 @@ class Player:
         self.name = name
 
     def refill_tilebox(self):
-
         bag_of_letter = self.game.bags_of_letters
         wanted_letter_amount = self.get_empty_fields_count()
         new_tiles = bag_of_letter.get_new_letters(wanted_letter_amount)
@@ -516,9 +462,6 @@ class Player:
             if field.state == FieldState.EMPTY:
                 count += 1
         return count
-
-    def set_name(self, name):
-        self.name = name
 
     def get_name(self):
         return self.name
@@ -586,13 +529,11 @@ class AIPlayer(Player):
         self.__get_tilebox_list()
         self.get_all_possible_words()
         all_possible_words = self.all_possible_words_dict.items()
-        # print("Found such possible words", all_possible_words)
-        print("Tilebox of AI player", self.tilebox_list)
-        print(len(all_possible_words))
+        # print("Tilebox of AI player", self.tilebox_list)
+        # print(len(all_possible_words))
         if len(all_possible_words) != 0:
             self.pass_strike = 0
             all_possible_words_list = [(x, self.all_possible_words_dict[x]) for x in self.all_possible_words_dict]
-            shuffle(all_possible_words_list)
             all_possible_words_list = sorted(all_possible_words_list, key=lambda x: len(x[1][0]))
             print(all_possible_words_list)
             if self.game.difficulty_level == DifficultyLevel.EASY:
@@ -602,8 +543,7 @@ class AIPlayer(Player):
             else:
                 el = all_possible_words_list[len(all_possible_words_list) // 2]
 
-            # for el in all_possible_words:
-            print('ai found', el)
+            # print('ai found', el)
             (word, placement_type, anchor_coords) = el[1]
             index = 0
             if placement_type == PlacementType.HORIZONTAL:
@@ -622,7 +562,6 @@ class AIPlayer(Player):
                         self.game.board.fields[i][end_y].place_tile(Tile(word[index]))
                     i += 1
                     index += 1
-                # break
             self.remove_tiles_from_tilebox()
         else:
             self.pass_strike += 1
@@ -651,24 +590,20 @@ class AIPlayer(Player):
         self.all_possible_words_dict = {}
         anchors = self.__get_anchors()
 
-        # print("Anchors horizontal are: ", anchors)
         self.__init_crosschecks(anchors, PlacementType.HORIZONTAL)
         print(self.cross_checks_board)
         for field_coords in anchors:
             # handle horizontal words cases
             limit = self.__get_limit_of_left_part(field_coords, anchors, PlacementType.HORIZONTAL)
             beginning = self.__get_beginning_of_left_part(field_coords, anchors, PlacementType.HORIZONTAL)
-            # print("H - For anchor", field_coords, "limit is", limit, "prefix:", beginning)
             self.__left_part(beginning, limit, field_coords, PlacementType.HORIZONTAL)
 
-        # print("Anchors vertical are: ", anchors)
         self.__init_crosschecks(anchors, PlacementType.VERTICAL)
         print(self.cross_checks_board)
         for field_coords in anchors:
             # handle vertical words cases
             limit = self.__get_limit_of_left_part(field_coords, anchors, PlacementType.VERTICAL)
             beginning = self.__get_beginning_of_left_part(field_coords, anchors, PlacementType.VERTICAL)
-            # print("V - For anchor", field_coords, "limit is", limit, "prefix:", beginning)
             self.__left_part(beginning, limit, field_coords, PlacementType.VERTICAL)
         pass
 
@@ -682,7 +617,6 @@ class AIPlayer(Player):
                 beginning = self.game.board.fields[current_coords[0]][current_coords[1]].tile.character + beginning
                 current_coords = (current_coords[0] - 1, current_coords[1])
             else:
-                # print('V - begging is', beginning, 'field coords', field_coords)
                 return beginning
         else:
             current_coords = (current_coords[0], current_coords[1] - 1)
@@ -691,7 +625,6 @@ class AIPlayer(Player):
                 beginning = self.game.board.fields[current_coords[0]][current_coords[1]].tile.character + beginning
                 current_coords = (current_coords[0], current_coords[1] - 1)
             else:
-                # print('H - begging is', beginning, 'field coords', field_coords)
                 return beginning
 
     def __can_be_anchor(self, coords):
@@ -720,17 +653,14 @@ class AIPlayer(Player):
         self.__extend_right_part(partial_word, anchor_coords, anchor_coords, placement_type)
         if limit > 0:
             for i, l in enumerate(self.tilebox_list):
-                # print('will now check partial word', partial_word + l)
                 if l != '?':
                     if self.game.dictionary.prefix_exists(partial_word + l):
-                        # print('checking word in  partial word left part', partial_word + l, placement_type)
                         del self.tilebox_list[i]
                         self.__left_part(partial_word + l, limit - 1, anchor_coords, placement_type)
                         self.tilebox_list.insert(i, l)
                 else:
                     for l_wild in string.ascii_lowercase:
                         if self.game.dictionary.prefix_exists(partial_word + l_wild):
-                            # print('checking word in  partial word left part', partial_word + l_wild, placement_type)
                             del self.tilebox_list[i]
                             self.__left_part(partial_word + l_wild, limit - 1, anchor_coords, placement_type)
                             self.tilebox_list.insert(i, l)
@@ -740,7 +670,6 @@ class AIPlayer(Player):
                 or placement_type == PlacementType.VERTICAL and field_coords[0] == config.BOARD_SIZE \
                 or self.game.board.fields[field_coords[0]][field_coords[1]].state == FieldState.EMPTY:
 
-            # print('will check partial word in right part', partial_word, field_coords)
             if partial_word in self.game.dictionary.possible_words and field_coords is not anchor_coords:
                 self.legal_move(partial_word, field_coords, placement_type, anchor_coords)
             for i, e in enumerate(self.tilebox_list):
@@ -751,7 +680,6 @@ class AIPlayer(Player):
                             field_coords[0], field_coords[1] + 1) if placement_type == PlacementType.HORIZONTAL else (
                             field_coords[0] + 1, field_coords[1])
                         if self.game.dictionary.prefix_exists(partial_word + e):
-                            # print('prefix exists', partial_word + e)
                             self.__extend_right_part(partial_word + e, next_field_coords, anchor_coords, placement_type)
                         self.tilebox_list.insert(i, e)
                 else:
@@ -763,7 +691,6 @@ class AIPlayer(Player):
                                 field_coords[1] + 1) if placement_type == PlacementType.HORIZONTAL else (
                                 field_coords[0] + 1, field_coords[1])
                             if self.game.dictionary.prefix_exists(partial_word + e_wild):
-                                # print('prefix exists', partial_word + e)
                                 self.__extend_right_part(partial_word + e_wild, next_field_coords, anchor_coords,
                                                          placement_type)
                             self.tilebox_list.insert(i, e)
@@ -788,7 +715,7 @@ class AIPlayer(Player):
         for field in self.tilebox.fields:
             if field.state is not FieldState.EMPTY:
                 self.tilebox_list.append(field.tile.character)
-        print('tilebox of player is', self.tilebox_list)
+        # print('tilebox of player is', self.tilebox_list)
 
     def __init_crosschecks(self, anchors, placement_type):
         self.cross_checks_board = [[set() for i in range(config.BOARD_SIZE + 1)] for j in
@@ -806,8 +733,6 @@ class AIPlayer(Player):
                             if len(word) == 1:
                                 self.cross_checks_board[i][anchor_column].add(l)
                             elif word in self.game.dictionary.possible_words:
-                                # if len(word) > 1:
-                                # print('V - expanded', [i, anchor_column], 'letter', l, 'word', word)
                                 self.cross_checks_board[i][anchor_column].add(l)
         else:
             anchor_rows = set()
@@ -822,8 +747,6 @@ class AIPlayer(Player):
                             if len(word) == 1:
                                 self.cross_checks_board[anchor_row][i].add(l)
                             elif word in self.game.dictionary.possible_words:
-                                # if len(word) > 1:
-                                # print('H - expanded', [anchor_row, i], 'letter', l, 'word', word)
                                 self.cross_checks_board[anchor_row][i].add(l)
 
     def __get_whole_word_expansion(self, field_coords, letter, placement_type):

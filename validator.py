@@ -81,7 +81,7 @@ class Validator:
                     partial_word += curr_field.tile.character
                 else:
                     break
-            print("h verification1: ", partial_word)
+            # print("h verification1: ", partial_word)
             partial_word = partial_word[::-1]
 
             for i in range(pos[1], config.BOARD_SIZE):
@@ -90,7 +90,7 @@ class Validator:
                     partial_word += curr_field.tile.character
                 else:
                     break
-            print("h verification2: ", partial_word)
+            # print("h verification2: ", partial_word)
             if not self.check_word(partial_word):
                 raise Exception("Word ", partial_word, " associated with pos: ", pos, " does not exist!")
             else:
@@ -106,7 +106,7 @@ class Validator:
                     partial_word += curr_field.tile.character
                 else:
                     break
-            print("vertical verification1: ", partial_word)
+            # print("vertical verification1: ", partial_word)
             partial_word = partial_word[::-1]
 
             for i in range(pos[0], config.BOARD_SIZE):
@@ -115,14 +115,14 @@ class Validator:
                     partial_word += curr_field.tile.character
                 else:
                     break
-            print("vertical verification2: ", partial_word)
+            # print("vertical verification2: ", partial_word)
             if not self.check_word(partial_word):
                 raise Exception("Word ", partial_word, " associated with pos: ", pos, " does not exist!")
             else:
                 print("word ", partial_word, "exists")
 
     def verify_board(self, board, round):
-        print("here")
+        # print("here")
         newly_added = []
         for row in range(config.BOARD_SIZE):
             col = 0
