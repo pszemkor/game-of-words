@@ -157,13 +157,16 @@ class Dictionary:
 
     def load_txt_file(self, file_path):
         possible_words_set = set()
-        with open(file_path, 'r', encoding='UTF-8', newline='') as txt_file:
-            for row in txt_file:
-                word = ''.join(x.lower() for x in row if x.isalpha())
-                possible_words_set.add(word)
+        try:
+            with open(file_path, 'r', encoding='UTF-8', newline='') as txt_file:
+                for row in txt_file:
+                    word = ''.join(x.lower() for x in row if x.isalpha())
+                    possible_words_set.add(word)
 
-        possible_words_list = filter(lambda x: len(x) > 1, sorted(list(possible_words_set)))
-        self.possible_words = dawg.CompletionDAWG(possible_words_list)
+            possible_words_list = filter(lambda x: len(x) > 1, sorted(list(possible_words_set)))
+            self.possible_words = dawg.CompletionDAWG(possible_words_list)
+        except Exception:
+            possible_words_set = set()
 
     def prefix_exists(self, prefix):
         return self.possible_words.has_keys_with_prefix(prefix)
