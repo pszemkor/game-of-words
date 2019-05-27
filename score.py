@@ -113,7 +113,7 @@ class ScoreCounter:
         horizontal_sorted = sorted(self.newly_added, key=lambda x: x[1])
         vertical_sorted = sorted(self.newly_added, key=lambda x: x[0])
         if (len(horizontal_sorted) == 1 and self.__check_whether_has_horizontal_neighbours(horizontal_sorted[0])) \
-                or horizontal_sorted[0][0] == horizontal_sorted[1][0]:
+                or (len(horizontal_sorted) > 1  and horizontal_sorted[0][0] == horizontal_sorted[1][0]):
             # horizontal word which consists of newly-added letters (with temporary state)
             word_bonus_factor = 1
             x = horizontal_sorted[0][0]
@@ -129,7 +129,7 @@ class ScoreCounter:
                 else:
                     break
             if len(self.newly_added) > 1:
-                for y in range(horizontal_sorted[1][1], horizontal_sorted[::-1][0][1]):
+                for y in range(horizontal_sorted[0][1] + 1, horizontal_sorted[::-1][0][1]):
                     if self.board.fields[x][y].state == model.FieldState.FIXED:
                         score += self.board.fields[x][y].tile.get_value()
                         print("for ", x, y, " value: ", self.board.fields[x][y].tile.get_value(), " score: ", score)
@@ -185,7 +185,7 @@ class ScoreCounter:
                 else:
                     break
             if len(self.newly_added) > 1:
-                for x in range(vertical_sorted[1][0], vertical_sorted[::-1][0][0]):
+                for x in range(vertical_sorted[0][0] + 1, vertical_sorted[::-1][0][0]):
                     if self.board.fields[x][y].state == model.FieldState.FIXED:
                         score += self.board.fields[x][y].tile.get_value()
                         print("for ", x, y, " value: ", self.board.fields[x][y].tile.get_value(), " score: ", score)
