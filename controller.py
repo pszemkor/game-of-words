@@ -85,6 +85,7 @@ class MouseEventHandler:
         elif hasattr(sprite, 'button') and sprite.button.text == 'Confirm':
             ev_to_send = events.ConfirmButtonPressedEvent()
         elif hasattr(sprite, 'button') and sprite.button.text == 'Pass':
+            self.game.active_player.put_all_temps_in_tilebox()
             ev_to_send = events.PassButtonPressedEvent()
         elif hasattr(sprite, 'button') and sprite.button.text == 'Mute':
             ev_to_send = events.MuteEvent()
