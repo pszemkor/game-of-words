@@ -81,9 +81,12 @@ class Board(FieldsContainer):
                             field.bonus = Bonus.BONUS_2L
                         elif line[line_iter].strip() == "3L":
                             field.bonus = Bonus.BONUS_3L
+                        else:
+                            field.bonus = Bonus.NO_BONUS
                         line_iter += 1
                     row += 1
         except Exception:
+            print('Something went wrong')
             self.ev_manager.post(events.EditDashboardBuildEvent(self))
 
     def __str__(self):
@@ -103,6 +106,24 @@ class Board(FieldsContainer):
 
             string += '\n'
         return string
+
+    # def print_bonus(self):
+    #     string = ""
+    #     for row in self.fields:
+    #         for el in row:
+    #                 if el.bonus is Bonus.NO_BONUS:
+    #                     string = string + "  |"
+    #                 elif el.bonus is Bonus.BONUS_2L:
+    #                     string = string + "2L|"
+    #                 elif el.bonus is Bonus.BONUS_3L:
+    #                     string = string + "3L|"
+    #                 elif el.bonus is Bonus.BONUS_2W:
+    #                     string = string + "2W|"
+    #                 else:
+    #                     string = string + "3W|"
+    #
+    #         string += '\n'
+    #     return string
 
     def notify(self, event):
         pass
@@ -136,13 +157,16 @@ class Dictionary:
 
     def load_txt_file(self, file_path):
         possible_words_set = set()
-        with open(file_path, 'r', encoding='UTF-8', newline='') as txt_file:
-            for row in txt_file:
-                word = ''.join(x.lower() for x in row if x.isalpha())
-                possible_words_set.add(word)
+        try:
+            with open(file_path, 'r', encoding='UTF-8', newline='') as txt_file:
+                for row in txt_file:
+                    word = ''.join(x.lower() for x in row if x.isalpha())
+                    possible_words_set.add(word)
 
-        possible_words_list = filter(lambda x: len(x) > 1, sorted(list(possible_words_set)))
-        self.possible_words = dawg.CompletionDAWG(possible_words_list)
+            possible_words_list = filter(lambda x: len(x) > 1, sorted(list(possible_words_set)))
+            self.possible_words = dawg.CompletionDAWG(possible_words_list)
+        except Exception:
+            possible_words_set = set()
 
     def prefix_exists(self, prefix):
         return self.possible_words.has_keys_with_prefix(prefix)
@@ -237,8 +261,7 @@ class Game:
                         self.board.set_active_field(field)
             else:
                 # todo - >  edit board bonus
-                new_bonus = (field.bonus + 1) % len(Bonus) + 1
-                field.bonus = 1 if new_bonus == 0 else new_bonus
+                field.bonus = (field.bonus + 1) % len(Bonus) + 1
 
             ev = events.UpdateFieldEvent(field)
             self.ev_manager.post(ev)

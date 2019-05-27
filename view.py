@@ -427,4 +427,5 @@ class GameView:
         elif isinstance(event, events.TitleBuildEvent):
             self.show_title()
         elif isinstance(event, events.EditDashboardBuildEvent):
+            self.clean()
             self.build_edit_dashboard(event.buttons, event.board)
