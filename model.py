@@ -55,7 +55,6 @@ class Board(FieldsContainer):
                 lines = f.readlines()
                 for line in lines:
                     line = line.split(", ")
-                    print(line)
                     line_iter = 0
                     for field in self.fields[row]:
                         if line[line_iter].strip() == "2W":
@@ -238,7 +237,8 @@ class Game:
             self.active_player.pass_strike = 0
             # validation
             try:
-                score_counter = SC.ScoreCounter(self.board)
+                newly_added, tiles_with_fixed_neighbours = self.validator.verify_board(self.board, self.round_no)
+                score_counter = SC.ScoreCounter(self.board, newly_added, tiles_with_fixed_neighbours)
                 # print("PLAYER SCORE: (pre) ", self.active_player.score)
                 self.active_player.score += score_counter.count_score()
                 # print("PLAYER SCORE: ", self.active_player.score)
